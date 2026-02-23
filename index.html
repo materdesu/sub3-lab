@@ -1,0 +1,3336 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>SUB3 LAB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #222222;
+    --accent: #e8ff00;
+    --accent2: #ff4444;
+    --accent3: #4488ff;
+    --text: #f0f0f0;
+    --text-muted: #666666;
+    --text-dim: #333333;
+    --green: #4dc84d;
+    --orange: #ff8c00;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+    padding-bottom: 70px;
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,10,0.97);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 4px; color: var(--accent); }
+  .logo span { color: var(--text-muted); }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: rgba(10,10,10,0.97);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    height: 60px;
+    z-index: 100;
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+    font-size: 10px;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .nav-item.active { color: var(--accent); }
+  .nav-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+  .nav-icon svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #222;
+    color: var(--text);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 200;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* SECTIONS */
+  .section { padding: 16px; }
+  .section + .section { padding-top: 0; }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+  }
+
+  .section-action {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  /* HOME: VDOT CARD */
+  .vdot-card {
+    background: var(--surface);
+    margin: 16px;
+    border-radius: 4px;
+    padding: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .vdot-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+
+  .vdot-main .label { font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 4px; }
+  .vdot-main .number { font-family: 'Bebas Neue', sans-serif; font-size: 72px; line-height: 1; color: var(--accent); }
+  .vdot-main .base { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  .sub3-target { text-align: right; }
+  .t-label { font-size: 10px; color: var(--text-muted); }
+  .t-gap { font-family: 'Bebas Neue', sans-serif; font-size: 48px; line-height: 1; color: var(--accent2); }
+  .t-unit { font-size: 10px; color: var(--text-muted); }
+
+  .progress-bar { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 6px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #4488ff, #e8ff00); border-radius: 2px; transition: width 0.5s; }
+  .progress-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 16px; }
+  .progress-labels .goal { color: var(--accent); }
+
+  .pace-zones { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+  .pace-zone {
+    flex-shrink: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    text-align: center;
+    min-width: 70px;
+  }
+  .pace-zone.highlight { border-color: var(--accent); }
+  .pz-label { font-size: 9px; color: var(--text-muted); margin-bottom: 4px; }
+  .pz-val { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600; }
+
+  /* HOME: GAP ANALYSIS */
+  .gap-analysis-card {
+    background: var(--surface);
+    margin: 0 16px 16px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .gap-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .gap-item:last-child { border-bottom: none; }
+  .gap-rank {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--accent);
+    min-width: 28px;
+    opacity: 0.5;
+  }
+  .gap-rank.rank-1 { opacity: 1; color: var(--accent); }
+  .gap-rank.rank-2 { opacity: 0.7; }
+  .gap-body { flex: 1; }
+  .gap-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .gap-desc { font-size: 11px; color: var(--text-muted); line-height: 1.6; }
+  .gap-action { font-size: 10px; color: var(--accent); margin-top: 4px; }
+
+  /* HOME: MISSION CARD */
+  .mission-card {
+    background: var(--surface);
+    margin: 0 16px 16px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .mission-header {
+    background: var(--surface2);
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mission-header-title { font-size: 11px; letter-spacing: 2px; color: var(--text-muted); font-family: 'Bebas Neue', sans-serif; }
+  .mission-phase { font-size: 10px; color: var(--accent); background: rgba(232,255,0,0.1); padding: 2px 8px; border-radius: 2px; }
+
+  .mission-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .mission-item:last-child { border-bottom: none; }
+  .mission-item:active { background: var(--surface2); }
+  .mission-item.done { opacity: 0.4; }
+
+  .mission-day {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    line-height: 1;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+  .mission-day.today { color: var(--accent); }
+  .mission-day.past { color: var(--text-dim); opacity: 0.5; }
+
+  .mission-body { flex: 1; }
+  .mission-type { font-size: 11px; font-weight: 700; margin-bottom: 3px; }
+  .mission-detail { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .mission-key { color: var(--accent); font-size: 10px; margin-top: 4px; }
+
+  .mission-check {
+    width: 24px;
+    height: 24px;
+    border: 1.5px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 14px;
+  }
+  .mission-check.checked { border-color: var(--green); color: var(--green); background: rgba(0,200,100,0.1); }
+  .mission-item.done .mission-body { text-decoration: line-through; color: var(--text-dim); }
+  .mission-edit-btn {
+    background: none; border: none; color: var(--text-dim);
+    cursor: pointer; padding: 2px 4px; flex-shrink: 0;
+    opacity: 0.5; transition: opacity 0.2s; display: flex; align-items: center;
+  }
+  .mission-edit-btn:active { opacity: 1; }
+  .mission-edit-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  .mission-day-block { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; min-width: 36px; gap: 2px; }
+  .mission-date { font-family: 'Bebas Neue', sans-serif; font-size: 22px; line-height: 1; color: var(--text-muted); }
+  .mission-date.today { color: var(--accent); }
+  .mission-date.past { color: var(--text-dim); opacity: 0.5; }
+  .mission-drag-handle {
+    background: none; border: none; color: var(--text-dim);
+    cursor: grab; padding: 2px 6px; flex-shrink: 0; opacity: 0.4;
+    display: flex; align-items: center; touch-action: none;
+  }
+  .mission-drag-handle:active { cursor: grabbing; opacity: 0.8; }
+  .mission-drag-handle svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .mission-item.dragging { opacity: 0.4; background: var(--surface2); }
+  .mission-item.drag-over { border-top: 2px solid var(--accent); }
+
+  /* 編集モーダル */
+  .edit-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000;
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  .edit-modal {
+    background: var(--surface); border-radius: 20px 20px 0 0;
+    padding: 24px; width: 100%; max-width: 480px;
+    border-top: 1px solid var(--border);
+  }
+  .edit-modal h3 { font-size: 14px; color: var(--accent); margin-bottom: 16px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; }
+  .edit-field { margin-bottom: 12px; }
+  .edit-field label { display: block; font-size: 10px; color: var(--text-dim); margin-bottom: 4px; letter-spacing: 1px; text-transform: uppercase; }
+  .edit-field input, .edit-field select, .edit-field textarea {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px; padding: 10px 12px; font-size: 13px;
+    box-sizing: border-box;
+  }
+  .edit-field textarea { height: 60px; resize: none; font-family: inherit; }
+  .edit-modal-btns { display: flex; gap: 8px; margin-top: 16px; }
+  .edit-modal-btns button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .btn-save-edit { background: var(--accent); color: #000; }
+  .btn-cancel-edit { background: var(--surface2); color: var(--text); }
+
+  .mission-generate {
+    padding: 16px;
+    text-align: center;
+  }
+
+  .btn-generate {
+    width: 100%;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 14px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    letter-spacing: 1px;
+  }
+
+  .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .mission-loading {
+    padding: 24px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  /* HOME: COACH ANALYSIS */
+  .coach-card {
+    background: var(--surface);
+    margin: 0 16px 16px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    padding: 16px;
+  }
+
+  .coach-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .coach-avatar { width: 36px; height: 36px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .coach-avatar svg { width: 20px; height: 20px; stroke: #000; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .coach-name { font-size: 13px; font-weight: 700; }
+  .coach-sub { font-size: 11px; color: var(--text-muted); }
+
+  .coach-message {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text);
+    border-left: 2px solid var(--accent);
+    padding-left: 12px;
+  }
+
+  /* LOG PAGE */
+  .import-zone {
+    background: var(--surface);
+    border: 2px dashed var(--border);
+    border-radius: 4px;
+    padding: 20px 16px;
+    text-align: center;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .import-zone.has-data { padding: 12px 16px; }
+  .import-zone:hover, .import-zone.drag-over { border-color: var(--accent); }
+  .import-zone .iz-icon { font-size: 28px; margin-bottom: 6px; color: var(--text-muted); display:flex;align-items:center;justify-content:center; }
+  .import-zone.has-data .iz-icon { font-size: 20px; margin: 0; }
+  .import-zone .iz-icon svg { stroke: var(--text-muted); }
+  .import-zone .iz-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .import-zone.has-data .iz-title { font-size: 12px; margin: 0; color: var(--text-muted); }
+  .import-zone .iz-sub { font-size: 11px; color: var(--text-muted); line-height: 1.7; }
+  .import-zone.has-data .iz-sub { display: none; }
+
+  .import-result {
+    background: rgba(77,200,77,0.1);
+    border: 1px solid var(--green);
+    border-radius: 4px;
+    padding: 10px 16px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    color: var(--green);
+    display: none;
+  }
+
+  .log-list { }
+
+  .log-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    gap: 12px;
+    transition: opacity 0.2s;
+  }
+  .log-item:active { opacity: 0.7; }
+
+  .log-date { min-width: 44px; text-align: center; }
+  .log-date .ld-day { font-family: 'Bebas Neue', sans-serif; font-size: 22px; line-height: 1; color: var(--text-muted); }
+  .log-date .ld-dow { font-size: 10px; color: var(--text-dim); }
+
+  .log-body { flex: 1; min-width: 0; }
+  .log-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+  .log-meta { font-size: 12px; color: var(--text-muted); }
+
+  .log-vdot { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--accent); min-width: 40px; text-align: right; }
+
+  .type-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 2px;
+    margin-right: 6px;
+    letter-spacing: 1px;
+  }
+  .type-easy { background: #1a3a1a; color: var(--green); }
+  .type-long { background: #1a2a3a; color: var(--accent3); }
+  .type-tempo { background: #3a2a1a; color: var(--orange); }
+  .type-interval { background: #3a1a1a; color: var(--accent2); }
+  .type-race { background: #2a1a3a; color: #cc88ff; }
+
+  /* RECORD PAGE */
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 1px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    font-family: 'Noto Sans JP', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    margin-top: 8px;
+  }
+
+  /* STATS PAGE */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+  .stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--accent); line-height: 1; }
+  .stat-unit { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .chart-title { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; letter-spacing: 2px; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface);
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    border-radius: 12px 12px 0 0;
+    padding: 20px 20px 40px;
+    transform: translateY(100%);
+    transition: transform 0.3s;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .modal-overlay.active .modal { transform: translateY(0); }
+
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+
+  .modal-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .m-card { background: var(--surface2); border-radius: 4px; padding: 10px; text-align: center; }
+  .ml { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+  .mv { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; }
+
+  .coach-response { font-size: 13px; line-height: 1.8; color: var(--text); border-left: 2px solid var(--accent); padding-left: 12px; margin-bottom: 16px; }
+
+  .btn-share {
+    width: 100%;
+    background: #000;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .btn-close-modal {
+    width: 100%;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+  }
+
+  /* LOADING DOTS */
+  .loading { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 13px; }
+  .dots { display: flex; gap: 4px; }
+  .dots span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: dot 1.2s infinite; }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dot { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+  /* COACH PAGE */
+  .quick-btn {
+    padding: 8px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text);
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    white-space: nowrap;
+    transition: border-color 0.2s;
+  }
+  .quick-btn:hover { border-color: var(--accent); }
+
+  .chat-bubble {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 12px;
+    line-height: 1.7;
+    max-width: 90%;
+  }
+  .chat-user { background: var(--surface2); align-self: flex-end; color: var(--text); }
+  .chat-coach { background: #0d1a0d; border: 1px solid #1a3a1a; align-self: flex-start; color: var(--text); }
+  .chat-coach strong { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">SUB3 <span>LAB</span></div>
+</header>
+
+<div class="toast" id="toast"></div>
+
+<!-- API KEY MODAL -->
+<div id="apiKeyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;padding:24px">
+  <div style="background:#111;border:1px solid #333;border-radius:16px;padding:24px;width:100%;max-width:400px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:16px;font-weight:700">APIキーを設定</div><button onclick="hideApiKeyModal()" style="background:none;border:none;color:#888;font-size:22px;cursor:pointer;padding:0 4px;line-height:1">✕</button></div>
+    <div style="font-size:12px;color:#888;margin-bottom:20px;line-height:1.8">
+      AIコーチ機能を使うには Anthropic の APIキーが必要です。<br>
+      キーはこのブラウザのローカルにのみ保存され、外部には送信されません。<br><br>
+      取得先 → <span style="color:#e8ff00">console.anthropic.com</span>
+    </div>
+    <input id="apiKeyInput" type="password" placeholder="sk-ant-..." 
+      style="width:100%;padding:12px;background:#1a1a1a;border:1px solid #444;border-radius:8px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;margin-bottom:12px"
+      onkeydown="if(event.key==='Enter')saveApiKey()">
+    <button onclick="saveApiKey()" style="width:100%;padding:13px;background:#e8ff00;color:#000;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer">保存して使い始める</button>
+    <div id="apiKeyError" style="font-size:11px;color:#ff4444;margin-top:8px;text-align:center"></div>
+    <button onclick="hideApiKeyModal()" style="width:100%;padding:10px;background:none;color:#666;border:none;font-size:12px;cursor:pointer;margin-top:4px">今はスキップ（AIコーチは使えません）</button>
+  </div>
+</div>
+
+<!-- PAGE: HOME -->
+<div class="page active" id="page-home">
+
+  <!-- VDOT CARD -->
+  <div class="vdot-card">
+    <div class="vdot-top">
+      <div class="vdot-main">
+        <div class="label" id="vdotLabel">CURRENT VDOT</div>
+        <div class="number" id="currentVdot">—</div>
+        <div class="base" id="vdotBase">データを読み込み中...</div>
+        <div id="vdotRaceChange" style="font-size:10px;margin-top:2px;font-family:'JetBrains Mono',monospace;"></div>
+      </div>
+      <div class="sub3-target">
+        <div class="t-label">あと</div>
+        <div class="t-gap" id="vdotGap">—</div>
+        <div class="t-unit">VDOT pts</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-labels"><span>30</span><span class="goal">SUB3 = VDOT 53</span></div>
+    <div class="pace-zones" id="paceZones"></div>
+  </div>
+
+  <!-- GAP ANALYSIS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">GAP ANALYSIS</div>
+      <div id="gapAnalysisUpdated" style="font-size:10px;color:var(--text-dim)"></div>
+    </div>
+  </div>
+
+  <div class="gap-analysis-card" id="gapAnalysisCard">
+    <div style="padding:20px;text-align:center;color:var(--text-dim);font-size:12px">
+      ミッションを生成するとギャップ分析が表示されます
+    </div>
+  </div>
+
+  <!-- WEEKLY MISSION -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">今週のミッション</div>
+      <button class="section-action" onclick="generateWeeklyMission()">更新</button>
+    </div>
+  </div>
+
+  <div class="mission-card" id="missionCard">
+    <div class="mission-generate">
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">ログデータを分析して今週のミッションを生成します</p>
+      <button class="btn-generate" id="generateBtn" onclick="generateWeeklyMission()">今週のミッションを生成する</button>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+<!-- PAGE: LOG -->
+<div class="page" id="page-log">
+  <div style="padding: 16px 16px 0;">
+    <div class="import-zone" id="importZone"
+      onclick="document.getElementById('fileInput').click()"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="handleFileDrop(event)">
+      <div class="iz-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+      <div class="iz-title">FIT / CSV をインポート</div>
+      <div class="iz-sub">FIT複数・ZIPも対応 / StravaのCSVも可<br>Coros Training Hub → Export Data → FIT</div>
+    </div>
+    <input type="file" id="fileInput" accept=".fit,.csv,.zip,*/*" multiple style="display:none" onchange="handleFileSelectMulti(this.files)">
+    <div class="import-result" id="importResult" style="display:none"></div>
+    <!-- インポート進捗 -->
+    <div id="importProgress" style="display:none;margin-top:10px;background:var(--surface);border-radius:8px;padding:12px;font-size:12px">
+      <div id="importProgressText" style="color:var(--text-muted);margin-bottom:6px">処理中...</div>
+      <div style="background:var(--border);border-radius:4px;height:4px">
+        <div id="importProgressBar" style="background:var(--accent);height:4px;border-radius:4px;width:0%;transition:width 0.2s"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">練習ログ</div>
+      <span id="logCount" style="font-size:11px;color:var(--text-muted);"></span>
+    </div>
+    <div class="log-list" id="logList"></div>
+  </div>
+</div>
+
+<!-- PAGE: COACH -->
+<div class="page" id="page-coach">
+  <div style="padding: 16px;">
+
+    <!-- コーチプロフィール -->
+    <div style="background:var(--surface);border-radius:12px;border:1px solid var(--border);padding:16px;margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div style="width:48px;height:48px;border-radius:12px;background:var(--accent);border:none;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><polyline points="16 11 17.5 13 20 10"/></svg></div>
+        <div>
+          <div style="font-size:13px;font-weight:700;letter-spacing:1px">RENATO CANOVA</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:2px">元ケニア・エチオピア代表コーチ / 世界記録保持者を多数育成</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.7">
+          <span style="color:var(--accent);font-weight:700">カノーバ理論の核心：</span>マラソンは「閾値ペースの延長」で攻略する。週の練習の<span style="color:var(--accent)">25〜35%を閾値走・インターバル</span>に充て、残りをEasyとLongで支える。VDOT40→53には乳酸閾値の底上げが最優先課題。
+        </div>
+        <div style="font-size:10px;color:var(--text-dim);border-top:1px solid var(--border);padding-top:8px;margin-top:2px;">
+          このAIコーチはカノーバのメソッドと川島さんの全ログ（76本・562km）を元に回答します
+        </div>
+      </div>
+    </div>
+
+    <!-- チャット相談 -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:10px">COACH CONSULTATION</div>
+      <div id="chatHistory" style="background:var(--surface);border-radius:12px 12px 0 0;border:1px solid var(--border);border-bottom:none;padding:16px;min-height:80px;max-height:350px;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px 0;">練習・怪我・レース戦略など、何でも聞いてください</div>
+      </div>
+      <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:0 0 12px 12px;overflow:hidden;background:var(--surface2);">
+        <input id="chatInput" type="text" placeholder="例：膝が痛い、今週どうすべき？" style="flex:1;padding:14px 12px;background:var(--surface2);border:none;color:var(--text);font-size:13px;outline:none;" onkeydown="if(event.key==='Enter')sendChat()">
+        <button onclick="sendChat()" style="padding:14px 18px;background:var(--accent);color:#000;border:none;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;">送信</button>
+      </div>
+    </div>
+
+    <!-- 今週の計画vs実績サマリー -->
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:10px">PLAN vs ACTUAL</div>
+      <div id="planActualSummary" style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:12px;color:var(--text-dim);text-align:center;padding:16px;">
+          ログをインポートすると自動で計画との差分を分析します
+        </div>
+      </div>
+    </div>
+
+    <!-- 今週を組み替えるボタン -->
+    <div style="margin-bottom:20px">
+      <button onclick="openRescheduleModal()" style="width:100%;padding:12px;background:var(--surface);color:var(--accent);border:1px solid var(--accent);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:1px">今週のスケジュールを組み替える</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- PAGE: STATS -->
+<div class="page" id="page-stats">
+  <div style="padding:16px 16px 100px;">
+
+    <!-- KPIグリッド -->
+    <div class="stats-grid" style="margin-bottom:16px;">
+      <div class="stat-card">
+        <div class="stat-label">VDOT <span style="font-size:9px;color:var(--text-dim)" id="vdotStatNote">参考値</span></div>
+        <div class="stat-val" id="totalDist" style="font-size:48px">—</div>
+        <div class="stat-unit" id="vdotTrend" style="color:var(--accent)"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">今月の距離</div>
+        <div class="stat-val" id="monthDist">—</div>
+        <div class="stat-unit">km <span id="monthTarget" style="font-size:9px;color:var(--text-dim)"></span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">今月の練習</div>
+        <div class="stat-val" id="totalRuns">—</div>
+        <div class="stat-unit">本</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">サブ3まで</div>
+        <div class="stat-val" id="maxVdot" style="color:var(--accent2)">—</div>
+        <div class="stat-unit">日</div>
+      </div>
+    </div>
+
+    <!-- VDOT推移 + トレンドライン -->
+    <div class="chart-card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+        <div class="chart-title">VDOT 定点観測 <span style="font-size:10px;color:var(--text-dim);font-weight:400;letter-spacing:0">RACEタグのみ</span></div>
+        <div id="vdotPrediction" style="font-size:10px;color:var(--accent)"></div>
+      </div>
+      <canvas id="vdotChart" height="160"></canvas>
+      <div id="vdotInsight" style="font-size:11px;color:var(--text-muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);line-height:1.7"></div>
+    </div>
+
+    <!-- 練習タイプ比率 -->
+    <div class="chart-card">
+      <div class="chart-title" style="margin-bottom:12px;">練習タイプ比率（直近4週）</div>
+      <canvas id="typeChart" height="50"></canvas>
+      <div id="typeChartLegend" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px;"></div>
+      <div id="typeInsight" style="font-size:11px;color:var(--text-muted);margin-top:10px;line-height:1.7"></div>
+    </div>
+
+    <!-- 週間距離トレンド -->
+    <div class="chart-card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+        <div class="chart-title">週間走行距離</div>
+        <div id="weeklyTarget" style="font-size:10px;color:var(--text-muted)">目標: <span style="color:var(--accent)">60km</span>/週</div>
+      </div>
+      <canvas id="monthlyChart" height="110"></canvas>
+    </div>
+
+    <!-- DATA BACKUP / API SETTINGS -->
+    <div style="margin-top:8px;">
+      <div style="font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:12px">DATA BACKUP</div>
+      <div style="background:var(--surface);border-radius:12px;border:1px solid var(--border);padding:16px">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.7">
+          ⚠️ データはブラウザのローカルに保存されています。<br>定期的にバックアップを保存してください。
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="exportBackup()" style="flex:1;padding:12px;background:var(--accent);color:#000;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer">バックアップ保存</button>
+          <button onclick="document.getElementById('restoreInput').click()" style="flex:1;padding:12px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer">復元</button>
+          <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="importBackup(this.files[0])">
+        </div>
+        <div id="backupStatus" style="font-size:11px;color:var(--text-muted);margin-top:10px;text-align:center"></div>
+      </div>
+    </div>
+    <div style="margin-top:16px;margin-bottom:24px;">
+      <div style="font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:12px">AI COACH SETTINGS</div>
+      <div style="background:var(--surface);border-radius:12px;border:1px solid var(--border);padding:16px">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">APIキー設定状況：<span id="apiKeyStatus" style="color:var(--accent)">確認中...</span></div>
+        <button onclick="showApiKeyModal()" style="width:100%;padding:12px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer">APIキーを変更する</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="showPage('home', this)">
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/><path d="M3 12v9h18v-9"/></svg></span>
+    <span style="font-size:10px;letter-spacing:.5px;">HOME</span>
+  </button>
+  <button class="nav-item" onclick="showPage('coach', this)">
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M17 11l1.5 1.5L21 10"/></svg></span>
+    <span style="font-size:10px;letter-spacing:.5px;">COACH</span>
+  </button>
+  <button class="nav-item" onclick="showPage('stats', this)">
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg></span>
+    <span style="font-size:10px;letter-spacing:.5px;">STATS</span>
+  </button>
+  <button class="nav-item" onclick="showPage('log', this)">
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></span>
+    <span style="font-size:10px;letter-spacing:.5px;">LOG</span>
+  </button>
+</nav>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal" onclick="closeDetailModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="detailTitle">練習詳細</div>
+    <div class="modal-metrics" id="detailMetrics"></div>
+    <div class="coach-response" id="detailCoach">
+      <div class="loading"><div class="dots"><span></span><span></span><span></span></div> AIコーチが分析中...</div>
+    </div>
+    <button class="btn-share" onclick="shareToX()">𝕏 でシェア</button>
+    <button class="btn-close-modal" onclick="document.getElementById('detailModal').classList.remove('active')">閉じる</button>
+  </div>
+</div>
+
+<script>
+// ===== CONFIG =====
+const CONFIG = {
+  targetVdot: 53,
+  targetRace: 'つくばマラソン2026',
+  targetDate: '2026-11-22',
+  athleteName: '川島大輝',
+  weeklyDays: 5,
+  // フェーズ定義
+  phases: [
+    { name: 'Phase1', label: '閾値強化', end: '2026-04-30', goal: '4\'30"/kmでハーフを走る', color: '#4488ff' },
+    { name: 'Phase2', label: 'マラソン特異的持久力', end: '2026-07-31', goal: '4\'15"/kmで30km走る', color: '#e8ff00' },
+    { name: 'Phase3', label: 'レース仕上げ', end: '2026-11-22', goal: 'つくばサブスリー達成', color: '#ff4444' },
+  ]
+};
+
+// ===== UTILS =====
+function calcVDOT(distKm, timeSec) {
+  if (!distKm || !timeSec || distKm < 3) return null;
+  const speedMperMin = (distKm * 1000) / (timeSec / 60);
+  const vo2 = -4.60 + 0.182258 * speedMperMin + 0.000104 * Math.pow(speedMperMin, 2);
+  const pct = 0.8 + 0.1894393 * Math.exp(-0.012778 * (timeSec/60)) + 0.2989558 * Math.exp(-0.1932605 * (timeSec/60));
+  const vdot = Math.round(vo2 / pct);
+  return vdot > 20 && vdot < 90 ? vdot : null;
+}
+
+function getPaceZones(vdot) {
+  // Jack Daniels VDOTテーブル
+  const table = {
+    38: { easy:'6\'42"', marathon:'5\'45"', threshold:'5\'13"', interval:'4\'51"', rep:'4\'31"' },
+    39: { easy:'6\'37"', marathon:'5\'40"', threshold:'5\'08"', interval:'4\'47"', rep:'4\'27"' },
+    40: { easy:'6\'32"', marathon:'5\'36"', threshold:'5\'05"', interval:'4\'44"', rep:'4\'24"' },
+    41: { easy:'6\'27"', marathon:'5\'31"', threshold:'5\'01"', interval:'4\'40"', rep:'4\'21"' },
+    42: { easy:'6\'22"', marathon:'5\'27"', threshold:'4\'57"', interval:'4\'37"', rep:'4\'18"' },
+    43: { easy:'6\'17"', marathon:'5\'23"', threshold:'4\'53"', interval:'4\'33"', rep:'4\'14"' },
+    44: { easy:'6\'12"', marathon:'5\'18"', threshold:'4\'49"', interval:'4\'30"', rep:'4\'11"' },
+    45: { easy:'6\'08"', marathon:'5\'15"', threshold:'4\'46"', interval:'4\'27"', rep:'4\'08"' },
+    46: { easy:'6\'03"', marathon:'5\'11"', threshold:'4\'42"', interval:'4\'23"', rep:'4\'05"' },
+    47: { easy:'5\'59"', marathon:'5\'07"', threshold:'4\'39"', interval:'4\'20"', rep:'4\'02"' },
+    48: { easy:'5\'55"', marathon:'5\'03"', threshold:'4\'35"', interval:'4\'17"', rep:'3\'59"' },
+    49: { easy:'5\'51"', marathon:'4\'59"', threshold:'4\'32"', interval:'4\'14"', rep:'3\'57"' },
+    50: { easy:'5\'47"', marathon:'4\'56"', threshold:'4\'28"', interval:'4\'11"', rep:'3\'54"' },
+    53: { easy:'5\'36"', marathon:'4\'46"', threshold:'4\'20"', interval:'4\'03"', rep:'3\'46"' },
+  };
+  const keys = Object.keys(table).map(Number).sort((a,b) => a-b);
+  let best = keys[0];
+  for (const k of keys) { if (k <= vdot) best = k; }
+  return table[best] || table[40];
+}
+
+function formatPace(distKm, timeSec) {
+  if (!distKm || !timeSec) return '—';
+  const paceTotal = timeSec / distKm;
+  const min = Math.floor(paceTotal / 60);
+  const sec = Math.round(paceTotal % 60);
+  return `${min}'${String(sec).padStart(2,'0')}"`;
+}
+
+function parseDuration(str) {
+  if (!str) return 0;
+  const parts = String(str).split(':').map(Number);
+  if (parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
+  if (parts.length === 2) return parts[0]*60 + parts[1];
+  return parseInt(str) || 0;
+}
+
+function formatDuration(sec) {
+  sec = Math.round(sec);
+  const h = Math.floor(sec/3600);
+  const m = Math.floor((sec%3600)/60);
+  const s = sec%60;
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function getCurrentPhase() {
+  const today = new Date();
+  for (const p of CONFIG.phases) {
+    if (today <= new Date(p.end)) return p;
+  }
+  return CONFIG.phases[CONFIG.phases.length - 1];
+}
+
+function getTypeLabel(type) {
+  const labels = { easy:'Easy走', long:'ロング走', tempo:'閾値走', interval:'インターバル', rep:'レペティション', race:'レース' };
+  return labels[type] || type || 'ランニング';
+}
+
+function classifyRunByPace(distKm, timeSec) {
+  if (!distKm || !timeSec) return 'easy';
+  const paceSecPerKm = timeSec / distKm;
+  if (distKm >= 28) return 'long';
+  if (paceSecPerKm < 265) return 'interval'; // 4'25"/km以下
+  if (paceSecPerKm < 295) return 'tempo';    // 4'55"/km以下
+  if (distKm >= 18) return 'long';
+  return 'easy';
+}
+
+// ===== LOCAL STORAGE =====
+function getLogs() {
+  try { return JSON.parse(localStorage.getItem('sub3_logs') || '[]'); } catch { return []; }
+}
+function saveLogs(logs) { localStorage.setItem('sub3_logs', JSON.stringify(logs)); }
+function addLog(log) {
+  const logs = getLogs();
+  log.id = Date.now();
+  logs.unshift(log);
+  saveLogs(logs);
+  return log;
+}
+function getMission() {
+  try { return JSON.parse(localStorage.getItem('sub3_mission') || 'null'); } catch { return null; }
+}
+function saveMission(m) { localStorage.setItem('sub3_mission', JSON.stringify(m)); }
+
+// ===== UI =====
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (name === 'log') renderLogList();
+  if (name === 'stats') renderStats();
+  if (name === 'home') checkHomeAutoUpdate();
+  if (name === 'coach') renderPlanActualSummary();
+}
+
+function checkHomeAutoUpdate() {
+  const saved = getMission();
+  if (!saved) return; // 初回は手動生成のみ
+  // 保存済みデータを即時表示
+  renderMissionCard(saved);
+  renderGapAnalysis(saved);
+
+  // 翌週（月曜日）になったら強制更新フラグ
+  const lastGen = saved.generatedAt ? new Date(saved.generatedAt) : null;
+  const hoursSince = lastGen ? (Date.now() - lastGen) / 3600000 : 999;
+
+  let shouldUpdate = hoursSince >= 24;
+
+  // ミッションが前の週のものなら強制更新（今日の月曜起点と保存時の週が違う場合）
+  if (lastGen && !shouldUpdate) {
+    const now = new Date();
+    const mondayOffset = now.getDay() === 0 ? -6 : 1 - now.getDay();
+    const thisMonday = new Date(now);
+    thisMonday.setDate(now.getDate() + mondayOffset);
+    thisMonday.setHours(0, 0, 0, 0);
+    if (lastGen < thisMonday) shouldUpdate = true; // 前週生成なら更新
+  }
+
+  if (shouldUpdate && getLogs().length > 0) {
+    generateWeeklyMission();
+  }
+}
+
+function showToast(msg, duration = 2500) {
+  const t = document.getElementById('toast');
+  // ✅ を SVGチェックマークに置換してinnerHTMLで描画
+  const cleaned = msg.replace(/^✅\s*/, '');
+  const hadCheck = msg.startsWith('✅');
+  if (hadCheck) {
+    t.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-right:5px;vertical-align:middle"><polyline points="20 6 9 17 4 12"/></svg>${cleaned}`;
+  } else {
+    t.textContent = msg;
+  }
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+// ===== VDOT CARD =====
+function renderVdotCard(vdot) {
+  // VDOTはレース・高強度のみ。nullならダッシュ表示
+  const display = vdot || findBestVdot();
+  const isEstimate = !findBestVdot(); // レース・TTがない場合は推定
+  document.getElementById('currentVdot').textContent = display || '—';
+  document.getElementById('vdotGap').textContent = display ? Math.max(0, CONFIG.targetVdot - display) : '—';
+  const vdotLabel = document.getElementById('vdotLabel');
+  if (vdotLabel) vdotLabel.textContent = isEstimate ? '参考VDOT（推定）' : 'VDOT';
+  const pct = Math.min(100, Math.max(0, (vdot - 30) / (CONFIG.targetVdot - 30) * 100));
+  document.getElementById('progressFill').style.width = pct + '%';
+
+  const zones = getPaceZones(vdot);
+  document.getElementById('paceZones').innerHTML = `
+    <div class="pace-zone"><div class="pz-label">EASY</div><div class="pz-val">${zones.easy}</div></div>
+    <div class="pace-zone highlight"><div class="pz-label">MARATHON</div><div class="pz-val">${zones.marathon}</div></div>
+    <div class="pace-zone highlight"><div class="pz-label">TEMPO</div><div class="pz-val">${zones.threshold}</div></div>
+    <div class="pace-zone"><div class="pz-label">INTERVAL</div><div class="pz-val">${zones.interval}</div></div>
+    <div class="pace-zone"><div class="pz-label">REP</div><div class="pz-val">${zones.rep}</div></div>
+  `;
+
+  // 最新RACEログをエビデンスとして表示
+  const latestRace = getLatestRaceLog();
+  const baseEl = document.getElementById('vdotBase');
+  if (latestRace) {
+    const dist = parseFloat(latestRace.distKm) || 0;
+    const timeSec = parseInt(latestRace.moving_time) || parseDuration(latestRace.duration);
+    const raceDate = new Date(latestRace.date);
+    const dateFmt = isNaN(raceDate) ? '' : raceDate.toLocaleDateString('ja-JP', {month:'short', day:'numeric'});
+    const raceName = latestRace.name || `${dist.toFixed(1)}km走`;
+    baseEl.textContent = `${dateFmt} ${raceName} (${dist.toFixed(1)}km @ ${formatPace(dist, timeSec)})`;
+  } else {
+    baseEl.textContent = 'RACEタグのログからVDOTが計算されます';
+  }
+
+  // RACEが複数あれば前回比を表示
+  const races = getRaceLogs();
+  const raceChangeEl = document.getElementById('vdotRaceChange');
+  if (raceChangeEl && races.length >= 2) {
+    const prev = races[races.length - 2];
+    const curr = races[races.length - 1];
+    const vPrev = calcVDOT(parseFloat(prev.distKm), parseInt(prev.moving_time) || 0);
+    const vCurr = calcVDOT(parseFloat(curr.distKm), parseInt(curr.moving_time) || 0);
+    if (vPrev && vCurr) {
+      const diff = vCurr - vPrev;
+      raceChangeEl.textContent = diff > 0 ? `▲ +${diff} 前回比` : diff < 0 ? `▼ ${diff} 前回比` : '── 前回と同値';
+      raceChangeEl.style.color = diff > 0 ? 'var(--accent)' : diff < 0 ? '#ff4444' : '#888';
+    }
+  } else if (raceChangeEl) {
+    raceChangeEl.textContent = '';
+  }
+}
+
+// ===== FIND BEST VDOT =====
+function getRaceLogs() {
+  // RACEタグが付いたログを日付昇順で返す
+  return getLogs()
+    .filter(l => l.runType === 'race' && parseFloat(l.distKm) >= 5)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+}
+
+function findBestVdot() {
+  // 最新RACEのVDOTを返す（定点観測の最新値）
+  const races = getRaceLogs();
+  if (races.length === 0) return null;
+  const latest = races[races.length - 1];
+  const dist = parseFloat(latest.distKm) || 0;
+  const timeSec = parseInt(latest.moving_time) || parseDuration(latest.duration);
+  return calcVDOT(dist, timeSec) || null;
+}
+
+function findBestVdotWithFallback() {
+  return findBestVdot() || 40;
+}
+
+function getLatestRaceLog() {
+  const races = getRaceLogs();
+  return races.length > 0 ? races[races.length - 1] : null;
+}
+
+// ===== WEEKLY MISSION GENERATION =====
+async function generateWeeklyMission() {
+  const logs = getLogs();
+  if (logs.length === 0) {
+    showToast('⚠️ まずCSVをインポートしてください');
+    return;
+  }
+
+  const btn = document.getElementById('generateBtn');
+  if (btn) btn.disabled = true;
+
+  document.getElementById('missionCard').innerHTML = `
+    <div class="mission-loading">
+      <div class="loading"><div class="dots"><span></span><span></span><span></span></div> 全データを分析してミッションを生成中...</div>
+    </div>`;
+
+  // 全データの統計を計算してAIに渡す
+  const currentVdot = findBestVdot();
+  const phase = getCurrentPhase();
+
+  // 直近4週間の練習データ
+  const fourWeeksAgo = new Date();
+  fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+  const recentLogs = logs.filter(l => new Date(l.date) >= fourWeeksAgo);
+
+  // 月別距離
+  const monthly = {};
+  logs.forEach(l => {
+    const month = l.date?.substring(0, 7);
+    if (month) monthly[month] = (monthly[month] || 0) + (parseFloat(l.distKm) || 0);
+  });
+
+  // ペース分布
+  const paceAnalysis = logs.reduce((acc, l) => {
+    const dist = parseFloat(l.distKm) || 0;
+    const timeSec = parseInt(l.moving_time) || 0;
+    if (dist < 1 || timeSec < 60) return acc;
+    const paceSecPerKm = timeSec / dist;
+    if (paceSecPerKm < 265) acc.fast++;
+    else if (paceSecPerKm < 295) acc.tempo++;
+    else if (paceSecPerKm < 330) acc.marathon++;
+    else acc.easy++;
+    return acc;
+  }, { fast: 0, tempo: 0, marathon: 0, easy: 0 });
+
+  // ロング走データ
+  const longRuns = logs.filter(l => (parseFloat(l.distKm) || 0) >= 20)
+    .map(l => `${parseFloat(l.distKm).toFixed(0)}km@${formatPace(parseFloat(l.distKm), parseInt(l.moving_time))}`);
+
+  // 今週のデータ
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  const thisWeek = logs.filter(l => new Date(l.date) >= weekAgo);
+
+  const dataContext = `
+選手：川島大輝、31歳
+現在VDOT：${currentVdot}
+目標：${CONFIG.targetRace}サブスリー（VDOT53）
+現在フェーズ：${phase.name} ${phase.label}（目標：${phase.goal}）
+週5日練習可能
+
+【全練習データ統計（${logs.length}件）】
+月別走行距離：${Object.entries(monthly).sort().map(([m,d])=>`${m}:${d.toFixed(0)}km`).join(', ')}
+
+ペース分布：
+- 4'25"以下（スピード域）：${paceAnalysis.fast}本
+- 4'25"-4'55"（閾値域）：${paceAnalysis.tempo}本
+- 4'55"-5'30"（マラソンペース域）：${paceAnalysis.marathon}本
+- 5'30"以上（Easy域）：${paceAnalysis.easy}本
+
+ロング走実績：${longRuns.join(', ')}
+
+直近4週間（${recentLogs.length}本）：
+${recentLogs.slice(0, 20).map(l => {
+  const dist = parseFloat(l.distKm) || 0;
+  const timeSec = parseInt(l.moving_time) || 0;
+  return `${l.date?.substring(5)} ${dist.toFixed(1)}km@${formatPace(dist, timeSec)} HR${l.average_heartrate ? Math.round(l.average_heartrate) : '—'}`;
+}).join('\n')}
+
+今週実績：${thisWeek.length}本、${thisWeek.reduce((s,l) => s + (parseFloat(l.distKm)||0), 0).toFixed(0)}km
+
+【重要な最近の情報】
+- 2/15に青梅マラソン30km（公式コース：難コース）を5'23"/km、HR157で完走
+- 2/22に4'15"ペースで2km試みるも心拍166でゼエゼエ（現在の閾値が4'15"付近）
+- スタミナはあるが、スピード持久力（乳酸閾値）が不足`;
+
+  try {
+    const data = await callClaude({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 2000,
+        system: `あなたはJack DanielsのVDOTメソッドに精通したエリートマラソンコーチです。
+データを科学的に分析し、選手の現状と目標のギャップを正確に把握した上で、ギャップの原因と今週実行すべき具体的なメニューを提示してください。
+
+【今日の日付】
+${new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}（この日付を基準に今後のスケジュールを組むこと）
+
+返答はJSON形式のみ。コードブロック不要。余分なテキスト不要。
+{
+  "diagnosis": "現状と方針を150字以内で",
+  "gaps": [
+    {
+      "rank": 1,
+      "title": "ギャップの原因タイトル（15字以内）",
+      "desc": "ログデータに基づいた具体的な根拠と説明（50字以内）",
+      "action": "このギャップを埋めるために必要なアクション（30字以内）"
+    },
+    { "rank": 2, "title": "...", "desc": "...", "action": "..." },
+    { "rank": 3, "title": "...", "desc": "...", "action": "..." }
+  ],
+  "missions": [
+    {
+      "day": "月",
+      "type": "Easy走",
+      "distance": "10km",
+      "pace": "5分40秒から5分50秒",
+      "detail": "心拍140-150でリラックス走",
+      "key": "有酸素ベースの構築"
+    }
+  ]
+}
+重要: ペースは必ず「X分XX秒」の形式で記載。シングルクォートや引用符は使わない。missionsは週5本。曜日は月火水木金土から選ぶ（日曜日は絶対に除外）。gaps は必ず3件。ユーザーから「〇曜日は走れない」などの制約が追加された場合はそれを優先する。`,
+        messages: [{ role: "user", content: dataContext }]
+    });
+    const text = data.content?.[0]?.text || '';
+
+    let parsed;
+    try {
+      let clean = text
+        .replace(/^```[\w]*\n?/gm, '')
+        .replace(/```$/gm, '')
+        .trim();
+      const jsonMatch = clean.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('No JSON found in: ' + text.slice(0,50));
+      clean = jsonMatch[0];
+      parsed = JSON.parse(clean);
+    } catch(e) {
+      console.error('JSON raw response:', text);
+      throw new Error('JSON parse failed: ' + text.slice(0, 100));
+    }
+
+    saveMission({ ...parsed, generatedAt: new Date().toISOString() });
+    renderMissionCard(parsed);
+    renderGapAnalysis(parsed);
+
+  } catch(e) {
+    console.error(e);
+    const errMsg = e?.message || String(e);
+    document.getElementById('missionCard').innerHTML = `
+      <div class="mission-generate">
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">生成に失敗しました。再試行してください。</p>
+        <p style="font-size:10px;color:#ff6666;margin-bottom:12px;word-break:break-all;">${errMsg}</p>
+        <button class="btn-generate" onclick="generateWeeklyMission()">再試行</button>
+      </div>`;
+  } finally {
+    const btn = document.getElementById('generateBtn');
+    if (btn) btn.disabled = false;
+  }
+}
+
+function renderGapAnalysis(mission) {
+  const gaps = mission.gaps || [];
+  if (!gaps.length) return;
+
+  const card = document.getElementById('gapAnalysisCard');
+  card.innerHTML = gaps.map(g => `
+    <div class="gap-item">
+      <div class="gap-rank rank-${g.rank}">${g.rank}</div>
+      <div class="gap-body">
+        <div class="gap-title">${g.title}</div>
+        <div class="gap-desc">${g.desc}</div>
+        <div class="gap-action">▶ ${g.action}</div>
+      </div>
+    </div>`).join('');
+
+  const updatedAt = mission.generatedAt
+    ? new Date(mission.generatedAt).toLocaleDateString('ja-JP', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) + '更新'
+    : '';
+  const el = document.getElementById('gapAnalysisUpdated');
+  if (el) el.textContent = updatedAt;
+}
+
+function renderMissionCard(mission) {
+  const days = ['月','火','水','木','金','土','日'];
+  const today = new Date();
+  const todayDow = ['日','月','火','水','木','金','土'][today.getDay()];
+
+  // 今週の月曜日を起点に各曜日の実日付を計算
+  const dayToDate = {};
+  const mondayOffset = today.getDay() === 0 ? -6 : 1 - today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() + mondayOffset);
+  days.forEach((d, i) => {
+    const dt = new Date(monday);
+    dt.setDate(monday.getDate() + i);
+    dayToDate[d] = dt;
+  });
+
+  // 完了状態をlocalStorageから読み込む
+  let doneState = {};
+  try { doneState = JSON.parse(localStorage.getItem('sub3_mission_done') || '{}'); } catch {}
+
+  // 日付順にソートしてから表示（曜日→実日付で並び替え）
+  const sortedMissions = [...(mission.missions || [])].sort((a, b) => {
+    const da = dayToDate[a.day] ? dayToDate[a.day].getTime() : 9999999999999;
+    const db = dayToDate[b.day] ? dayToDate[b.day].getTime() : 9999999999999;
+    return da - db;
+  });
+
+  const items = sortedMissions.map((m, sortedIdx) => {
+    // 元のidxはオリジナル配列でのインデックス（編集・完了チェック用）
+    const idx = (mission.missions || []).findIndex(orig =>
+      orig.day === m.day && orig.type === m.type && orig.distance === m.distance
+    );
+    const isToday = m.day === todayDow;
+    const isPast = days.indexOf(m.day) < days.indexOf(todayDow);
+    const isDone = doneState[idx] || false;
+    const typeClass = {
+      'Easy走': 'type-easy',
+      'ロング走': 'type-long',
+      '閾値走': 'type-tempo',
+      'インターバル': 'type-interval',
+      'レペティション': 'type-interval',
+      'ミドル走': 'type-long',
+      'レース': 'type-race'
+    }[m.type] || 'type-easy';
+
+    const dateObj = dayToDate[m.day];
+    const dateLabel = dateObj
+      ? `${dateObj.getMonth()+1}/${dateObj.getDate()}`
+      : '';
+
+    return `
+      <div class="mission-item ${isDone ? 'done' : ''}" id="mission-item-${idx}" draggable="true" data-idx="${idx}">
+        <div class="mission-drag-handle" title="並び替え">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="16" x2="20" y2="16"/></svg>
+        </div>
+        <div class="mission-day-block">
+          <div class="mission-date ${isToday ? 'today' : isPast ? 'past' : ''}">${dateLabel}</div>
+          <div class="mission-day ${isToday ? 'today' : isPast ? 'past' : ''}">${m.day}</div>
+        </div>
+        <div class="mission-body">
+          <div class="mission-type">
+            <span class="type-badge ${typeClass}">${m.type}</span>${m.distance}
+          </div>
+          <div class="mission-detail">${m.pace}${m.detail ? ' · ' + m.detail : ''}</div>
+          ${m.key ? `<div class="mission-key">▶ ${m.key}</div>` : ''}
+        </div>
+        <button class="mission-edit-btn" onclick="openMissionEdit(${idx})" title="編集">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <div class="mission-check ${isDone ? 'checked' : ''}" onclick="toggleMissionDone(${idx})">
+          ${isDone ? '✓' : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  const phase = getCurrentPhase();
+  document.getElementById('missionCard').innerHTML = `
+    <div class="mission-header">
+      <div class="mission-header-title">WEEKLY MISSION</div>
+      <div class="mission-phase">${phase.label}</div>
+    </div>
+    ${items}`;
+
+  initMissionDragDrop();
+}
+
+function initMissionDragDrop() {
+  const items = document.querySelectorAll('.mission-item');
+  let dragSrc = null;
+
+  // PCドラッグ：mission-itemにdraggable、ただしdragstartはハンドルからのみ許可
+  items.forEach(item => {
+    const handle = item.querySelector('.mission-drag-handle');
+
+    // ハンドル以外からのdragstartをキャンセル
+    item.addEventListener('dragstart', e => {
+      if (!item.dataset.draggingFromHandle) {
+        e.preventDefault();
+        return;
+      }
+      dragSrc = item;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    item.addEventListener('dragend', () => {
+      item.classList.remove('dragging');
+      delete item.dataset.draggingFromHandle;
+      document.querySelectorAll('.mission-item').forEach(i => i.classList.remove('drag-over'));
+    });
+    item.addEventListener('dragover', e => {
+      e.preventDefault();
+      if (item !== dragSrc) {
+        document.querySelectorAll('.mission-item').forEach(i => i.classList.remove('drag-over'));
+        item.classList.add('drag-over');
+      }
+    });
+    item.addEventListener('drop', e => {
+      e.preventDefault();
+      if (dragSrc && dragSrc !== item) swapMissions(dragSrc, item);
+    });
+
+    if (handle) {
+      handle.addEventListener('mousedown', () => {
+        item.dataset.draggingFromHandle = '1';
+      });
+    }
+  });
+
+  // iOSタッチ：ハンドルのtouchstart/move/endのみで制御（スクロールには干渉しない）
+  items.forEach(item => {
+    const handle = item.querySelector('.mission-drag-handle');
+    if (!handle) return;
+
+    let dragging = false;
+    let touchItem = null;
+
+    handle.addEventListener('touchstart', e => {
+      dragging = true;
+      touchItem = item;
+      item.classList.add('dragging');
+      e.stopPropagation(); // スクロールイベントと分離
+    }, { passive: true });
+
+    handle.addEventListener('touchmove', e => {
+      if (!dragging) return;
+      e.preventDefault(); // ハンドルタッチ中のみスクロール禁止
+      const touch = e.touches[0];
+      const els = document.elementsFromPoint(touch.clientX, touch.clientY);
+      const target = els.find(el => el.classList.contains('mission-item') && el !== touchItem);
+      document.querySelectorAll('.mission-item').forEach(i => i.classList.remove('drag-over'));
+      if (target) target.classList.add('drag-over');
+    }, { passive: false });
+
+    handle.addEventListener('touchend', e => {
+      if (!dragging) return;
+      dragging = false;
+      item.classList.remove('dragging');
+      const touch = e.changedTouches[0];
+      const els = document.elementsFromPoint(touch.clientX, touch.clientY);
+      const target = els.find(el => el.classList.contains('mission-item') && el !== touchItem);
+      document.querySelectorAll('.mission-item').forEach(i => i.classList.remove('drag-over'));
+      if (target && touchItem) swapMissions(touchItem, target);
+      touchItem = null;
+    }, { passive: true });
+  });
+}
+
+function swapMissions(srcEl, tgtEl) {
+  const srcIdx = parseInt(srcEl.dataset.idx);
+  const tgtIdx = parseInt(tgtEl.dataset.idx);
+  const mission = getMission();
+  if (!mission) return;
+  // 曜日は固定したまま、トレーニング内容（type/distance/pace/detail/key）だけ入れ替える
+  const ms = mission.missions;
+  const srcContent = { type: ms[srcIdx].type, distance: ms[srcIdx].distance, pace: ms[srcIdx].pace, detail: ms[srcIdx].detail, key: ms[srcIdx].key };
+  const tgtContent = { type: ms[tgtIdx].type, distance: ms[tgtIdx].distance, pace: ms[tgtIdx].pace, detail: ms[tgtIdx].detail, key: ms[tgtIdx].key };
+  Object.assign(ms[srcIdx], tgtContent);
+  Object.assign(ms[tgtIdx], srcContent);
+  saveMission(mission);
+  renderMissionCard(mission);
+  showToast('✅ 順番を変更しました');
+}
+
+function toggleMissionDone(idx) {
+  let doneState = {};
+  try { doneState = JSON.parse(localStorage.getItem('sub3_mission_done') || '{}'); } catch {}
+  doneState[idx] = !doneState[idx];
+  localStorage.setItem('sub3_mission_done', JSON.stringify(doneState));
+
+  const item = document.getElementById('mission-item-' + idx);
+  const check = item.querySelector('.mission-check');
+  if (doneState[idx]) {
+    item.classList.add('done');
+    check.classList.add('checked');
+    check.textContent = '✓';
+  } else {
+    item.classList.remove('done');
+    check.classList.remove('checked');
+    check.textContent = '';
+  }
+}
+
+function openMissionEdit(idx) {
+  const mission = getMission();
+  if (!mission || !mission.missions[idx]) return;
+  const m = mission.missions[idx];
+
+  const days = ['月','火','水','木','金','土','日'];
+  const types = ['Easy走','閾値走','インターバル','ロング走','レペティション','レース'];
+
+  const overlay = document.createElement('div');
+  overlay.className = 'edit-modal-overlay';
+  overlay.id = 'editModalOverlay';
+  overlay.innerHTML = `
+    <div class="edit-modal">
+      <h3>✏️ ${m.day}曜日のメニューを編集</h3>
+      <div class="edit-field">
+        <label>曜日</label>
+        <select id="edit-day">
+          ${days.map(d => `<option value="${d}" ${d === m.day ? 'selected' : ''}>${d}</option>`).join('')}
+        </select>
+      </div>
+      <div class="edit-field">
+        <label>種別</label>
+        <select id="edit-type">
+          ${types.map(t => `<option value="${t}" ${t === m.type ? 'selected' : ''}>${t}</option>`).join('')}
+        </select>
+      </div>
+      <div class="edit-field">
+        <label>距離</label>
+        <input id="edit-distance" type="text" value="${m.distance || ''}">
+      </div>
+      <div class="edit-field">
+        <label>ペース</label>
+        <input id="edit-pace" type="text" value="${m.pace || ''}">
+      </div>
+      <div class="edit-field">
+        <label>詳細</label>
+        <textarea id="edit-detail">${m.detail || ''}</textarea>
+      </div>
+      <div class="edit-field">
+        <label>ポイント</label>
+        <input id="edit-key" type="text" value="${m.key || ''}">
+      </div>
+      <div class="edit-modal-btns">
+        <button class="btn-cancel-edit" onclick="closeMissionEdit()">キャンセル</button>
+        <button class="btn-save-edit" onclick="saveMissionEdit(${idx})">保存</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeMissionEdit(); });
+}
+
+function closeMissionEdit() {
+  const overlay = document.getElementById('editModalOverlay');
+  if (overlay) overlay.remove();
+}
+
+function saveMissionEdit(idx) {
+  const mission = getMission();
+  if (!mission) return;
+  mission.missions[idx] = {
+    ...mission.missions[idx],
+    day:      document.getElementById('edit-day').value,
+    type:     document.getElementById('edit-type').value,
+    distance: document.getElementById('edit-distance').value,
+    pace:     document.getElementById('edit-pace').value,
+    detail:   document.getElementById('edit-detail').value,
+    key:      document.getElementById('edit-key').value,
+  };
+  saveMission(mission);
+  closeMissionEdit();
+  renderMissionCard(mission);
+  showToast('✅ メニューを更新しました');
+}
+
+// ===== LOG =====
+let currentLogIndex = null;
+
+function openTypeSelect(index) {
+  const logs = getLogs();
+  const log = logs[index];
+  const current = log.runType || classifyRunByPace(parseFloat(log.distKm), parseInt(log.moving_time) || 0);
+
+  const types = [
+    { key: 'easy',     label: 'EASY',  cls: 'type-easy',     desc: 'リカバリー・有酸素ベース走' },
+    { key: 'long',     label: 'LONG',  cls: 'type-long',     desc: 'ロング走・距離走' },
+    { key: 'tempo',    label: 'TEMPO', cls: 'type-tempo',    desc: '閾値走・ペース走' },
+    { key: 'interval', label: 'INT',   cls: 'type-interval', desc: 'インターバル・レペティション' },
+    { key: 'race',     label: 'RACE',  cls: 'type-race',     desc: 'レース・タイムトライアル → VDOT正式記録' },
+  ];
+
+  const overlay = document.createElement('div');
+  overlay.className = 'edit-modal-overlay';
+  overlay.id = 'typeSelectOverlay';
+
+  overlay.innerHTML = `
+    <div class="edit-modal" style="padding:20px;">
+      <h3 style="margin:0 0 4px;font-size:14px;letter-spacing:1px;">トレーニングタイプを変更</h3>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:16px;">${log.name || log.distKm + 'km走'}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${types.map(t => `
+          <button onclick="changeLogType(${index},'${t.key}')" style="
+            display:flex;align-items:center;gap:12px;
+            background:${t.key === current ? 'var(--surface2)' : 'var(--surface)'};
+            border:1px solid ${t.key === current ? 'var(--accent)' : 'var(--border)'};
+            border-radius:8px;padding:12px 14px;cursor:pointer;text-align:left;width:100%;">
+            <span class="type-badge ${t.cls}" style="flex-shrink:0;">${t.label}</span>
+            <span style="font-size:12px;color:var(--text-muted);">${t.desc}</span>
+            ${t.key === current ? '<span style="margin-left:auto;font-size:10px;color:var(--accent);">現在</span>' : ''}
+          </button>`).join('')}
+      </div>
+      <button onclick="document.getElementById('typeSelectOverlay').remove()" style="margin-top:14px;width:100%;padding:10px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);font-size:12px;cursor:pointer;">キャンセル</button>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+}
+
+function changeLogType(index, newType) {
+  const logs = getLogs();
+  logs[index].runType = newType;
+  saveLogs(logs);
+  document.getElementById('typeSelectOverlay')?.remove();
+  renderLogList();
+  renderVdotCard(findBestVdotWithFallback());
+  const typeLabel = { easy:'EASY', long:'LONG', tempo:'TEMPO', interval:'インターバル', race:'RACE（VDOT更新）' }[newType] || newType;
+  showToast(`✅ ${typeLabel} に変更しました`);
+}
+
+function deleteLog(index) {
+  const logs = getLogs();
+  const log = logs[index];
+  const name = log.name || `${parseFloat(log.distKm).toFixed(1)}km走`;
+  if (!confirm(`「${name}」を削除しますか？`)) return;
+  logs.splice(index, 1);
+  saveLogs(logs);
+  renderLogList();
+  renderVdotCard(findBestVdot());
+  showToast('🗑 削除しました');
+}
+
+function renderLogList() {
+  const logs = getLogs();
+  const container = document.getElementById('logList');
+  document.getElementById('logCount').textContent = logs.length + '件';
+
+  // データがあればインポートゾーンをコンパクトに
+  const importZone = document.getElementById('importZone');
+  if (logs.length > 0) {
+    importZone.classList.add('has-data');
+    importZone.innerHTML = `<div style="display:flex;align-items:center;gap:8px;justify-content:center"><span class="iz-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span><span class="iz-title">FIT複数・ZIP / CSV を追加インポート</span></div>`;
+  }
+
+  if (logs.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-muted)">
+      <div style="margin-bottom:12px;opacity:0.3"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><path d="M8 21l2-6 2 2 2-4 2 4"/><path d="M7 11c0-2 1.5-4 5-4s5 2 5 4"/></svg></div>
+      <div>まだ記録がありません</div>
+      <div style="font-size:12px;margin-top:8px">CSVをインポートして始めよう</div>
+    </div>`;
+    return;
+  }
+
+  const dowLabels = ['日','月','火','水','木','金','土'];
+
+  container.innerHTML = logs.map((log, i) => {
+    const dist = parseFloat(log.distKm) || 0;
+    const timeSec = parseInt(log.moving_time) || parseDuration(log.duration);
+    const pace = formatPace(dist, timeSec);
+    const hr = log.average_heartrate ? `HR${Math.round(log.average_heartrate)}` : '';
+    const date = new Date(log.date);
+    const day = isNaN(date) ? '—' : date.getDate();
+    const dow = isNaN(date) ? '' : dowLabels[date.getDay()];
+    const runType = log.runType || classifyRunByPace(dist, timeSec);
+    const typeClass = { easy:'type-easy', long:'type-long', tempo:'type-tempo', interval:'type-interval', race:'type-race' }[runType] || 'type-easy';
+    const typeName = { easy:'EASY', long:'LONG', tempo:'TEMPO', interval:'INT', race:'RACE' }[runType] || 'RUN';
+
+    return `<div class="log-item" onclick="showLogDetail(${i})">
+      <div class="log-date">
+        <div class="ld-day">${day}</div>
+        <div class="ld-dow">${dow}</div>
+      </div>
+      <div class="log-body">
+        <div class="log-name">
+          <button class="type-badge ${typeClass}" onclick="event.stopPropagation();openTypeSelect(${i})" title="タップでタイプ変更" style="cursor:pointer;border:none;">${typeName}</button>${log.name || dist.toFixed(1) + 'km走'}
+        </div>
+        <div class="log-meta">${dist.toFixed(1)}km　${pace}/km${hr ? '　' + hr : ''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onclick="event.stopPropagation();deleteLog(${i})" style="background:none;border:none;color:#555;cursor:pointer;padding:4px 6px;border-radius:6px;line-height:1" title="削除"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function showLogDetail(index) {
+  currentLogIndex = index;
+  const logs = getLogs();
+  const log = logs[index];
+  const dist = parseFloat(log.distKm) || 0;
+  const timeSec = parseInt(log.moving_time) || parseDuration(log.duration);
+  const pace = formatPace(dist, timeSec);
+  const vdot = calcVDOT(dist, timeSec);
+  const hr = log.average_heartrate ? Math.round(log.average_heartrate) : '—';
+  const isFit = log.source === 'coros_fit';
+
+  document.getElementById('detailTitle').textContent = log.name || dist.toFixed(1) + 'km走';
+
+  const runType = log.runType || classifyRunByPace(dist, timeSec);
+
+  // 基本メトリクス（常に表示）
+  let metricsHTML = `
+    <div class="m-card"><div class="ml">距離</div><div class="mv">${dist.toFixed(1)}<span style="font-size:11px">km</span></div></div>
+    <div class="m-card"><div class="ml">ペース</div><div class="mv" style="font-size:13px">${pace}</div></div>
+    ${(runType === 'race' || runType === 'interval' || runType === 'tempo') && vdot ? `<div class="m-card"><div class="ml">VDOT参考値</div><div class="mv">${vdot}<span style="font-size:9px;color:var(--text-dim);display:block;margin-top:2px">レースで正式測定推奨</span></div></div>` : ''}
+    <div class="m-card"><div class="ml">タイム</div><div class="mv" style="font-size:13px">${formatDuration(timeSec)}</div></div>
+    <div class="m-card"><div class="ml">平均HR</div><div class="mv">${hr}</div></div>
+    <div class="m-card"><div class="ml">最大HR</div><div class="mv">${log.max_heartrate || '—'}</div></div>`;
+
+  // FITデータがある場合は追加メトリクス
+  if (isFit) {
+    metricsHTML += `
+    <div class="m-card"><div class="ml">ケイデンス</div><div class="mv" style="font-size:14px">${log.avg_cadence || '—'}<span style="font-size:10px">spm</span></div></div>
+    <div class="m-card"><div class="ml">パワー</div><div class="mv" style="font-size:14px">${log.avg_power || '—'}<span style="font-size:10px">W</span></div></div>
+    <div class="m-card"><div class="ml">獲得標高</div><div class="mv" style="font-size:14px">${log.total_ascent || '—'}<span style="font-size:10px">m</span></div></div>`;
+  }
+
+  document.getElementById('detailMetrics').innerHTML = metricsHTML;
+
+  // ラップデータ表示（FITのみ）
+  let lapHTML = '';
+  if (isFit && log.laps && log.laps.length > 0) {
+    const lapRows = log.laps.filter(l => l.dist && l.dist > 0.3).map((l, i) => {
+      const lapPace = l.dist && l.time ? formatPace(l.dist, l.time) : '—';
+      const lapHR = l.hr || '—';
+      return `<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">
+        <span style="color:var(--text-muted);min-width:30px">${i+1}km</span>
+        <span style="font-family:'JetBrains Mono',monospace;min-width:60px">${lapPace}/km</span>
+        <span style="color:var(--text-muted)">HR${lapHR}</span>
+      </div>`;
+    }).join('');
+    if (lapRows) {
+      lapHTML = `<div style="margin-bottom:14px">
+        <div style="font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:8px">LAP DATA</div>
+        ${lapRows}
+      </div>`;
+    }
+  }
+
+  document.getElementById('detailCoach').innerHTML = lapHTML + `<div class="loading"><div class="dots"><span></span><span></span><span></span></div> AIコーチが分析中...</div>`;
+  document.getElementById('detailModal').classList.add('active');
+
+  // AIに渡す詳細データを構築
+  let coachPrompt = `練習：${log.name}、${dist.toFixed(1)}km、${formatDuration(timeSec)}、${pace}/km、平均HR${hr}bpm`;
+  if (isFit) {
+    if (log.max_heartrate) coachPrompt += `、最大HR${log.max_heartrate}bpm`;
+    if (log.avg_cadence) coachPrompt += `、ケイデンス${log.avg_cadence}spm`;
+    if (log.avg_power) coachPrompt += `、平均パワー${log.avg_power}W`;
+    if (log.total_ascent) coachPrompt += `、獲得標高${log.total_ascent}m`;
+    if (vdot) coachPrompt += `、VDOT換算${vdot}`;
+    // ラップの前半・後半比較
+    if (log.laps && log.laps.length >= 4) {
+      const half = Math.floor(log.laps.length / 2);
+      const firstHalf = log.laps.slice(0, half).filter(l => l.time && l.dist);
+      const secondHalf = log.laps.slice(half).filter(l => l.time && l.dist);
+      if (firstHalf.length && secondHalf.length) {
+        const fPace = formatPace(
+          firstHalf.reduce((s,l) => s + l.dist, 0),
+          firstHalf.reduce((s,l) => s + l.time, 0)
+        );
+        const sPace = formatPace(
+          secondHalf.reduce((s,l) => s + l.dist, 0),
+          secondHalf.reduce((s,l) => s + l.time, 0)
+        );
+        coachPrompt += `。前半ペース${fPace}/km、後半ペース${sPace}/km`;
+      }
+    }
+  }
+
+  try {
+    const data = await callClaude({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 600,
+        system: `あなたはマラソンコーチです。この練習データを科学的に分析し、具体的なフィードバックを200字以内で。<strong>タグで重要箇所を強調。選手：川島大輝、現在VDOT${findBestVdotWithFallback()}、目標つくばマラソンサブスリー（VDOT53）。${isFit ? 'FITデータあり。ケイデンス・パワー・ラップ推移も分析すること。' : ''}`,
+        messages: [{ role: "user", content: coachPrompt }]
+    });
+    const rawText = data.content?.[0]?.text || 'フィードバック取得失敗';
+    // **太字** → <strong>、残った * を除去
+    const formatted = rawText
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*/g, '');
+    document.getElementById('detailCoach').innerHTML = lapHTML + formatted;
+  } catch(e) {
+    document.getElementById('detailCoach').innerHTML = lapHTML + `VDOT ${vdot || '—'} / ペース ${pace} / HR ${hr}`;
+  }
+}
+
+function closeDetailModal(e) {
+  if (e.target === document.getElementById('detailModal')) {
+    document.getElementById('detailModal').classList.remove('active');
+  }
+}
+
+// ===== SHARE =====
+function shareToX() {
+  const logs = getLogs();
+  if (currentLogIndex === null) return;
+  const log = logs[currentLogIndex];
+  const dist = parseFloat(log.distKm) || 0;
+  const timeSec = parseInt(log.moving_time) || parseDuration(log.duration);
+  const vdot = calcVDOT(dist, timeSec);
+  const pace = formatPace(dist, timeSec);
+  const text = `今日の練習 🏃\n${dist.toFixed(1)}km @ ${pace}/km\nVDOT：${vdot || '—'}\n\nサブスリーまであとVDOT${Math.max(0, CONFIG.targetVdot - (vdot || findBestVdot()))}ポイント！\n\n#サブスリー #マラソン #SUB3LAB`;
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`);
+}
+
+// ===== MANUAL RECORD =====
+async function saveManualRun() {
+  const dist = parseFloat(document.getElementById('recDist').value);
+  const timeStr = document.getElementById('recTime').value;
+  const type = document.getElementById('recType').value;
+  const date = document.getElementById('recDate').value;
+  const memo = document.getElementById('recMemo').value;
+  const hr = document.getElementById('recHR').value;
+
+  if (!dist || !timeStr || !date) { showToast('⚠️ 日付・距離・タイムは必須です'); return; }
+
+  const timeSec = parseDuration(timeStr);
+  const log = {
+    distKm: dist,
+    moving_time: timeSec,
+    duration: timeStr,
+    runType: type,
+    date,
+    memo,
+    average_heartrate: hr ? parseFloat(hr) : null,
+    name: `${getTypeLabel(type)} ${dist}km`,
+    source: 'manual'
+  };
+  addLog(log);
+
+  const newVdot = findBestVdot();
+  renderVdotCard(newVdot);
+  showToast('✅ 記録しました！');
+  // 自動でプラン分析
+  const newLogs2 = getLogs();
+  const newMission2 = findMissionForLog(newLogs2[0]);
+  if (newMission2) runPlanAnalysis(0, newMission2);
+
+  document.getElementById('recDist').value = '';
+  document.getElementById('recTime').value = '';
+  document.getElementById('recMemo').value = '';
+  document.getElementById('recHR').value = '';
+
+  showPage('log', document.querySelectorAll('.nav-item')[3]);
+  setTimeout(() => showLogDetail(0), 300);
+}
+
+// ===== FILE HANDLER (FIT複数・ZIP・CSV対応) =====
+function handleFileDrop(e) {
+  e.preventDefault();
+  document.getElementById('importZone').classList.remove('drag-over');
+  handleFileSelectMulti(e.dataTransfer.files);
+}
+
+async function handleFileSelectMulti(files) {
+  if (!files || files.length === 0) return;
+
+  // filesをArrayにコピーしてからinputをリセット（Safariでfiles参照が消えるのを防ぐ）
+  const fileArray = Array.from(files);
+  const fileInput = document.getElementById('fileInput');
+  if (fileInput) setTimeout(() => { fileInput.value = ''; }, 100);
+
+  const allFitBuffers = []; // {name, buffer}
+  let csvText = null;
+
+  // ZIPとFITとCSVを仕分け
+  for (const file of fileArray) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (ext === 'zip') {
+      // ZIPを展開してFITを取り出す
+      const zipBuffers = await extractFitFromZip(file);
+      allFitBuffers.push(...zipBuffers);
+    } else if (ext === 'fit') {
+      const buf = await readAsArrayBuffer(file);
+      allFitBuffers.push({ name: file.name, buffer: buf });
+    } else if (ext === 'csv' && !csvText) {
+      csvText = await readAsText(file);
+    }
+  }
+
+  // CSVがあれば先に処理
+  if (csvText) {
+    try {
+      const imported = parseStravaCsv(csvText);
+      if (imported.length > 0) saveImportedLog(imported);
+    } catch(e) { console.error('CSV parse error', e); }
+  }
+
+  // FITが1件以下なら従来通り
+  if (allFitBuffers.length === 0) return;
+  if (allFitBuffers.length === 1) {
+    try {
+      const log = parseFitFile(allFitBuffers[0].buffer);
+      if (log) saveImportedLog([log]);
+      else showToast('⚠️ FITファイルの読み込みに失敗しました');
+    } catch(e) { showToast('❌ FITの読み込みに失敗しました'); }
+    return;
+  }
+
+  // 複数FITの一括処理
+  await processBulkFit(allFitBuffers);
+}
+
+async function processBulkFit(fitFiles) {
+  const progressEl = document.getElementById('importProgress');
+  const progressText = document.getElementById('importProgressText');
+  const progressBar = document.getElementById('importProgressBar');
+  progressEl.style.display = 'block';
+
+  const results = [];
+  const errors = [];
+
+  for (let i = 0; i < fitFiles.length; i++) {
+    const pct = Math.round((i / fitFiles.length) * 100);
+    progressBar.style.width = pct + '%';
+    progressText.textContent = `処理中... ${i + 1} / ${fitFiles.length} ファイル`;
+
+    try {
+      const log = parseFitFile(fitFiles[i].buffer);
+      if (log) results.push(log);
+    } catch(e) {
+      errors.push(fitFiles[i].name);
+    }
+
+    // UIをブロックしないよう少し待つ
+    if (i % 10 === 9) await sleep(10);
+  }
+
+  progressBar.style.width = '100%';
+  progressText.textContent = `完了！`;
+
+  if (results.length > 0) {
+    // 既存ログとマージ
+    const existing = getLogs();
+    const existingIds = new Set(existing.map(l => l.fit_id || l.strava_id).filter(Boolean));
+    const filtered = results.filter(l => !existingIds.has(l.fit_id || l.strava_id));
+    const merged = [...filtered, ...existing].sort((a,b) => new Date(b.date) - new Date(a.date));
+    saveLogs(merged);
+
+    renderVdotCard(findBestVdot());
+    renderLogList();
+
+    setTimeout(() => { progressEl.style.display = 'none'; }, 2000);
+
+    const msg = `✅ ${filtered.length}件インポート完了！${errors.length > 0 ? `（${errors.length}件エラー）` : ''}`;
+    progressText.textContent = msg;
+    showToast(msg);
+  } else {
+    progressText.textContent = `⚠️ インポートできるデータがありませんでした`;
+  }
+}
+
+// ZIPからFITファイルを取り出す（JSで実装）
+async function extractFitFromZip(file) {
+  const buffer = await readAsArrayBuffer(file);
+  const data = new Uint8Array(buffer);
+  const fits = [];
+
+  // ZIPのローカルファイルヘッダーを探す (PK\x03\x04)
+  let pos = 0;
+  while (pos < data.length - 30) {
+    // ローカルファイルヘッダーシグネチャ
+    if (data[pos] === 0x50 && data[pos+1] === 0x4B && data[pos+2] === 0x03 && data[pos+3] === 0x04) {
+      const compression = data[pos+8] | (data[pos+9] << 8);
+      const compressedSize = data[pos+18] | (data[pos+19] << 8) | (data[pos+20] << 16) | (data[pos+21] << 24);
+      const uncompressedSize = data[pos+22] | (data[pos+23] << 8) | (data[pos+24] << 16) | (data[pos+25] << 24);
+      const fileNameLen = data[pos+26] | (data[pos+27] << 8);
+      const extraLen = data[pos+28] | (data[pos+29] << 8);
+      const fileNameStart = pos + 30;
+      const fileName = new TextDecoder().decode(data.slice(fileNameStart, fileNameStart + fileNameLen));
+      const dataStart = fileNameStart + fileNameLen + extraLen;
+
+      if (fileName.toLowerCase().endsWith('.fit') && compressedSize > 0) {
+        const compressedData = data.slice(dataStart, dataStart + compressedSize);
+
+        if (compression === 0) {
+          // 非圧縮
+          fits.push({ name: fileName, buffer: compressedData.buffer.slice(compressedData.byteOffset, compressedData.byteOffset + compressedData.byteLength) });
+        } else if (compression === 8) {
+          // Deflate圧縮 → DecompressionStreamで展開
+          try {
+            const decompressed = await decompressDeflate(compressedData);
+            fits.push({ name: fileName, buffer: decompressed });
+          } catch(e) {
+            console.warn('Failed to decompress:', fileName, e);
+          }
+        }
+      }
+      pos = dataStart + compressedSize;
+    } else {
+      pos++;
+    }
+  }
+  return fits;
+}
+
+async function decompressDeflate(data) {
+  // DecompressionStream APIを使用 (Chrome対応)
+  if (typeof DecompressionStream === 'undefined') {
+    throw new Error('DecompressionStream not supported');
+  }
+  const ds = new DecompressionStream('deflate-raw');
+  const writer = ds.writable.getWriter();
+  writer.write(data);
+  writer.close();
+  const reader = ds.readable.getReader();
+  const chunks = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  const totalLen = chunks.reduce((s, c) => s + c.length, 0);
+  const result = new Uint8Array(totalLen);
+  let offset = 0;
+  for (const chunk of chunks) { result.set(chunk, offset); offset += chunk.length; }
+  return result.buffer;
+}
+
+// ユーティリティ
+function readAsArrayBuffer(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result);
+    r.onerror = reject;
+    r.readAsArrayBuffer(file);
+  });
+}
+
+function readAsText(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result);
+    r.onerror = reject;
+    r.readAsText(file, 'UTF-8');
+  });
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function saveImportedLog(newLogs) {
+  const existing = getLogs();
+  // fit_idとstrava_idの両方でチェック（削除済みは存在しないのでそのまま登録される）
+  const existingFitIds = new Set(existing.map(l => l.fit_id).filter(Boolean));
+  const existingStravaIds = new Set(existing.map(l => l.strava_id).filter(Boolean));
+
+  const filtered = newLogs.filter(l => {
+    if (l.fit_id && existingFitIds.has(l.fit_id)) return false;
+    if (l.strava_id && existingStravaIds.has(l.strava_id)) return false;
+    return true;
+  });
+
+  const result = document.getElementById('importResult');
+  result.style.display = 'block';
+
+  if (filtered.length === 0) {
+    result.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>すでに登録済みです</span>';
+    showToast('✅ 最新の状態です');
+    return;
+  }
+
+  const merged = [...filtered, ...existing].sort((a,b) => new Date(b.date) - new Date(a.date));
+  saveLogs(merged);
+  result.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>${filtered.length}件インポートしました！</span>`;
+  renderVdotCard(findBestVdot());
+  renderLogList();
+  showToast(`✅ ${filtered.length}件取り込みました！`);
+  // 今週のログを自動でプラン分析（非同期）
+  const allLogs2 = getLogs();
+  allLogs2.forEach((l, i) => {
+    if (!l.planAnalysis) {
+      const m2 = findMissionForLog(l);
+      if (m2) setTimeout(() => runPlanAnalysis(i, m2), i * 800);
+    }
+  });
+}
+
+// ===== FIT PARSER =====
+function parseFitFile(buffer) {
+  const data = new Uint8Array(buffer);
+
+  // ヘッダー確認
+  if (data[8] !== 0x2E || data[9] !== 0x46 || data[10] !== 0x49 || data[11] !== 0x54) {
+    throw new Error('Not a valid FIT file');
+  }
+
+  const dv = new DataView(buffer);
+  let pos = data[0]; // ヘッダーサイズ（通常14）
+
+  const localDefs = {};
+  let session = null;
+  const laps = [];
+  const records = [];
+
+  // fsizeはヘッダーに書いてある実際のバイト数をそのまま使う
+  function readVal(pos, fsize, baseType, littleEndian) {
+    const bt = baseType & 0x9F;
+    const INVALIDS = {0:0xFF,1:0x7F,2:0xFF,3:0x7FFF,4:0xFFFF,5:0x7FFFFFFF,6:0xFFFFFFFF,10:0xFF,11:0xFFFF,12:0xFFFFFFFF};
+    let val;
+    try {
+      if (fsize === 1) {
+        if (bt === 1) val = dv.getInt8(pos);
+        else val = dv.getUint8(pos);
+      } else if (fsize === 2) {
+        if (bt === 3) val = dv.getInt16(pos, littleEndian);
+        else val = dv.getUint16(pos, littleEndian);
+      } else if (fsize === 4) {
+        if (bt === 5) val = dv.getInt32(pos, littleEndian);
+        else if (bt === 8) val = dv.getFloat32(pos, littleEndian);
+        else val = dv.getUint32(pos, littleEndian);
+      } else if (fsize === 8) {
+        // uint64 → JavaScriptはBigIntか上位32bit無視
+        val = dv.getUint32(pos, littleEndian);
+      } else if (bt === 7) {
+        // string
+        let s = '';
+        for (let i = 0; i < fsize; i++) { const c = data[pos+i]; if (c === 0) break; s += String.fromCharCode(c); }
+        return s;
+      } else {
+        val = dv.getUint8(pos);
+      }
+    } catch(e) { return null; }
+    if (bt in INVALIDS && val === INVALIDS[bt]) return null;
+    return val;
+  }
+
+  while (pos < data.length - 2) {
+    try {
+      const hdr = data[pos++];
+
+      if (hdr & 0x80) { // 圧縮タイムスタンプ
+        const localNum = (hdr >> 5) & 0x03;
+        if (localNum in localDefs) {
+          const def = localDefs[localNum];
+          pos += def.fields.reduce((s, f) => s + f[1], 0);
+        }
+        continue;
+      }
+
+      const isDef = (hdr >> 6) & 1;
+      const hasDev = (hdr >> 5) & 1;
+      const localNum = hdr & 0x0F;
+
+      if (isDef) {
+        pos++; // reserved
+        const arch = data[pos++];
+        const le = arch === 0;
+        const globalNum = le ? dv.getUint16(pos, true) : dv.getUint16(pos, false); pos += 2;
+        const nFields = data[pos++];
+        const fields = [];
+        for (let i = 0; i < nFields; i++) {
+          fields.push([data[pos], data[pos+1], data[pos+2]]);
+          pos += 3;
+        }
+        const devFields = [];
+        if (hasDev) {
+          const nDev = data[pos++];
+          for (let i = 0; i < nDev; i++) {
+            devFields.push([data[pos], data[pos+1], data[pos+2]]);
+            pos += 3;
+          }
+        }
+        localDefs[localNum] = { globalNum, le, fields, devFields };
+      } else {
+        if (!(localNum in localDefs)) { pos++; continue; }
+        const def = localDefs[localNum];
+        const msg = {};
+
+        for (const [fnum, fsize, btype] of def.fields) {
+          msg[fnum] = readVal(pos, fsize, btype, def.le);
+          pos += fsize;
+        }
+        for (const [fnum, fsize] of def.devFields) {
+          pos += fsize; // devフィールドはスキップ
+        }
+
+        if (def.globalNum === 18) session = msg;       // session
+        else if (def.globalNum === 19) laps.push(msg); // lap
+        else if (def.globalNum === 20) records.push(msg); // record
+      }
+    } catch(e) {
+      pos++;
+      continue;
+    }
+  }
+
+  if (!session && records.length === 0) return null;
+
+  let distKm, timeSec, avgHR, maxHR, avgCad, ascent, calories, avgPower;
+
+  if (session) {
+    // fsizeをそのまま使って読んだ正しい値
+    // field[7]=elapsed_time(ms/1000=sec), field[9]=distance(cm→km), field[16]=avgHR, field[17]=maxHR
+    // field[18]=avgCadence(strides/min*2=steps/min), field[20]=ascent(m), field[11]=calories
+    distKm   = session[9]  != null ? session[9]  / 100 / 1000 : null;
+    timeSec  = session[7]  != null ? session[7]  / 1000       : null;
+    avgHR    = session[16] != null ? Math.round(session[16])  : null;
+    maxHR    = session[17] != null ? Math.round(session[17])  : null;
+    avgCad   = session[18] != null ? session[18] * 2          : null;
+    ascent   = session[20] != null ? session[20]              : null;
+    calories = session[11] != null ? session[11]              : null;
+    // Corosのパワー field[134] はraw値 → /48でwatts近似
+    avgPower = session[134] != null ? Math.round(session[134] / 48) : null;
+  }
+
+  // recordsから補完（セッションで値が取れなかった場合のみ）
+  if (records.length > 0 && (!distKm || distKm < 0.1)) {
+    // record field[5] = accumulated_power or distance? → タイムスタンプで時間計算
+    const ts = records.map(r => r[253]).filter(v => v != null);
+    if (ts.length >= 2 && !timeSec) timeSec = ts[ts.length-1] - ts[0];
+
+    const hrs = records.map(r => r[3]).filter(v => v != null && v > 30 && v < 250);
+    if (hrs.length > 0 && !avgHR) avgHR = Math.round(hrs.reduce((a,b)=>a+b,0)/hrs.length);
+    if (hrs.length > 0 && !maxHR) maxHR = Math.max(...hrs);
+  }
+  // 上下動・接地時間・上下動比（Corosスケール補正済み）
+  const vo       = session?.[57]  != null ? session[57]  : null;
+  const stance   = session?.[89]  != null ? session[89]  : null;
+  const vRatio   = session?.[91]  != null ? session[91] / 100 : null;
+
+  // 開始時刻 (FIT epoch = 631065600 = 1989/12/31 offset)
+  const FIT_EPOCH = 631065600;
+  const startRaw = session?.[2] ?? records[0]?.[253];
+  const startTs = startRaw != null ? new Date((startRaw + FIT_EPOCH) * 1000) : new Date();
+
+  // ラップデータ (1kmごと)
+  const lapData = laps.map(l => ({
+    dist:  l[9]  != null ? l[9] / 100 / 1000 : null,
+    time:  l[8]  != null ? l[8] / 1000 : null,
+    hr:    l[16] != null ? Math.round(l[16]) : null,
+    power: l[13] != null ? l[13] : null,
+    cad:   l[18] != null ? l[18] * 2 : null,
+  }));
+
+  // fit_id = 開始タイムスタンプ（重複チェック用）
+  const fitId = 'fit_' + (startRaw || Date.now());
+
+  const log = {
+    id: Date.now(),
+    fit_id: fitId,
+    name: startTs.toLocaleDateString('ja-JP', {month:'short', day:'numeric'}) + ' ランニング',
+    date: startTs.toISOString(),
+    distKm,
+    moving_time: timeSec ? Math.round(timeSec) : null,
+    average_heartrate: avgHR,
+    max_heartrate: maxHR,
+    avg_cadence: avgCad,
+    total_ascent: ascent,
+    calories,
+    avg_power: avgPower,
+    vertical_oscillation: vo,
+    stance_time: stance,
+    vertical_ratio: vRatio,
+    laps: lapData,
+    source: 'coros_fit',
+    runType: classifyRunByPace(distKm, timeSec ? Math.round(timeSec) : 0),
+  };
+
+  return log;
+}
+
+function parseStravaCsv(text) {
+  const lines = text.split('\n');
+  if (lines.length < 2) return [];
+  const headers = parseCsvLine(lines[0]).map(h => h.trim().replace(/"/g, ''));
+  const logs = [];
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const cols = parseCsvLine(line);
+    const row = {};
+    headers.forEach((h, idx) => row[h] = (cols[idx] || '').replace(/"/g, '').trim());
+
+    // ランニング判定（日本語・英語両対応）
+    const type = cols[3]?.replace(/"/g, '').trim() || '';
+    if (!type.includes('ラン') && !type.toLowerCase().includes('run')) continue;
+
+    // 距離はインデックス6（km単位）を直接使用
+    const distKm = parseFloat(cols[6] || 0);
+    if (distKm < 0.5) continue;
+
+    // 移動時間はインデックス16（秒）
+    const movingTime = parseInt(parseFloat(cols[16] || 0));
+    if (!movingTime) continue;
+
+    const dateStr = cols[1]?.replace(/"/g, '').trim() || '';
+    const date = new Date(dateStr.replace(/\//g, '-'));
+    if (isNaN(date.getTime())) continue;
+
+    const hr = parseFloat(cols[31] || 0) || null;
+    const actId = cols[0]?.replace(/"/g, '').trim() || (date.getTime() + i + '');
+
+    logs.push({
+      id: Date.now() + i,
+      strava_id: actId,
+      name: cols[2]?.replace(/"/g, '').trim() || distKm.toFixed(1) + 'km走',
+      date: date.toISOString(),
+      distKm: distKm,
+      moving_time: movingTime,
+      average_heartrate: hr,
+      runType: classifyRunByPace(distKm, movingTime),
+      source: 'strava_csv'
+    });
+  }
+  return logs;
+}
+
+function parseCsvLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === '"') { inQuotes = !inQuotes; }
+    else if (line[i] === ',' && !inQuotes) { result.push(current); current = ''; }
+    else { current += line[i]; }
+  }
+  result.push(current);
+  return result;
+}
+
+// ===== STATS =====
+function renderStats() {
+  const logs = getLogs();
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthLogs = logs.filter(l => new Date(l.date) >= monthStart);
+  const monthDist = monthLogs.reduce((s, l) => s + (parseFloat(l.distKm) || 0), 0);
+  const vdot = findBestVdotWithFallback();
+
+  // VDOT前回比（RACEログのみで計算）
+  const races = getRaceLogs();
+  let trendStr = '── RACEデータなし';
+  if (races.length >= 2) {
+    const prev = races[races.length - 2];
+    const curr = races[races.length - 1];
+    const vPrev = calcVDOT(parseFloat(prev.distKm), parseInt(prev.moving_time) || 0);
+    const vCurr = calcVDOT(parseFloat(curr.distKm), parseInt(curr.moving_time) || 0);
+    if (vPrev && vCurr) {
+      const diff = vCurr - vPrev;
+      trendStr = diff > 0 ? `▲ +${diff} 前回レース比` : diff < 0 ? `▼ ${diff} 前回レース比` : '── 前回と同値';
+    }
+  } else if (races.length === 1) {
+    trendStr = '── 初回計測';
+  }
+
+  // つくばまでの残り日数
+  const target = new Date(CONFIG.targetDate);
+  const daysLeft = Math.ceil((target - now) / 86400000);
+
+  // 今月の目標距離（月で比例配分）
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const targetMonthly = 240; // 月240km目標（週60km×4週）
+  const monthPace = Math.round(monthDist / now.getDate() * daysInMonth);
+
+  document.getElementById('totalDist').textContent = vdot;
+  document.getElementById('vdotTrend').textContent = trendStr;
+  document.getElementById('monthDist').textContent = monthDist.toFixed(0);
+  document.getElementById('monthTarget').textContent = `このペース ${monthPace}km/月`;
+  document.getElementById('totalRuns').textContent = monthLogs.length;
+  document.getElementById('maxVdot').textContent = daysLeft;
+
+  renderVdotChart(logs);
+  renderTypeChart(logs);
+  renderWeeklyChart(logs);
+}
+
+function renderVdotChart(logs) {
+  const canvas = document.getElementById('vdotChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 320;
+  const H = 160;
+  canvas.width = W * window.devicePixelRatio;
+  canvas.height = H * window.devicePixelRatio;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  ctx.clearRect(0, 0, W, H);
+
+  // RACEタグのみを日付昇順でプロット
+  const races = getRaceLogs();
+  const points = races.map(l => {
+    const dist = parseFloat(l.distKm) || 0;
+    const timeSec = parseInt(l.moving_time) || parseDuration(l.duration);
+    const v = calcVDOT(dist, timeSec);
+    if (!v) return null;
+    const date = new Date(l.date);
+    const label = isNaN(date) ? '' : `${date.getMonth()+1}/${date.getDate()}`;
+    return { v, label, name: l.name || `${dist.toFixed(0)}km`, date };
+  }).filter(Boolean);
+
+  // RACEデータなし → 案内メッセージ
+  if (points.length === 0) {
+    ctx.fillStyle = '#444'; ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('ログのRACEバッジをタップして', W/2, H/2 - 10);
+    ctx.fillText('VDOT定点観測を始めましょう', W/2, H/2 + 10);
+    const el = document.getElementById('vdotPrediction');
+    if (el) el.textContent = '';
+    const insight = document.getElementById('vdotInsight');
+    if (insight) insight.textContent = 'LOGページでレース・TTのバッジを「RACE」に変更するとここにグラフが表示されます';
+    return;
+  }
+
+  const vdots = points.map(p => p.v);
+  const minV = Math.min(...vdots, 35) - 2;
+  const maxV = Math.max(...vdots, CONFIG.targetVdot) + 2;
+  const pad = { t: 14, b: 28, l: 30, r: 10 };
+  const gW = W - pad.l - pad.r;
+  const gH = H - pad.t - pad.b;
+  const n = points.length;
+
+  // x位置：1本のときは中央、複数は均等配置
+  const xOf = (i) => n === 1 ? pad.l + gW / 2 : pad.l + (i / (n - 1)) * gW;
+  const yOf = (v) => pad.t + (1 - (v - minV) / (maxV - minV)) * gH;
+
+  // 目標ライン VDOT53
+  const ty = yOf(CONFIG.targetVdot);
+  ctx.strokeStyle = 'rgba(232,255,0,0.15)';
+  ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(pad.l, ty); ctx.lineTo(W - pad.r, ty); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(232,255,0,0.4)'; ctx.font = '9px sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText('目標 53', pad.l + 2, ty - 3);
+
+  // グリッド（Y軸）
+  ctx.strokeStyle = '#1e1e1e'; ctx.lineWidth = 1;
+  [35, 40, 45, 50, 53].forEach(v => {
+    if (v < minV || v > maxV) return;
+    const y = yOf(v);
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    ctx.fillStyle = '#444'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(v, pad.l - 3, y + 3);
+  });
+
+  // 複数ある場合はライン描画
+  if (n >= 2) {
+    ctx.strokeStyle = 'rgba(232,255,0,0.5)'; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    points.forEach((p, i) => { i === 0 ? ctx.moveTo(xOf(i), yOf(p.v)) : ctx.lineTo(xOf(i), yOf(p.v)); });
+    ctx.stroke();
+
+    // 上昇・下降に色分けした線分
+    for (let i = 1; i < n; i++) {
+      const up = points[i].v >= points[i-1].v;
+      ctx.strokeStyle = up ? '#e8ff00' : '#ff4444';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(xOf(i-1), yOf(points[i-1].v));
+      ctx.lineTo(xOf(i), yOf(points[i].v));
+      ctx.stroke();
+    }
+  }
+
+  // ドット + VDOT値 + 日付ラベル
+  points.forEach((p, i) => {
+    const x = xOf(i), y = yOf(p.v);
+    const isLatest = i === n - 1;
+
+    // ドット（最新は大きく）
+    ctx.fillStyle = isLatest ? '#e8ff00' : 'rgba(232,255,0,0.6)';
+    ctx.beginPath();
+    ctx.arc(x, y, isLatest ? 5 : 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // VDOT数値（ドットの上）
+    ctx.fillStyle = isLatest ? '#e8ff00' : '#aaa';
+    ctx.font = isLatest ? 'bold 11px sans-serif' : '10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(p.v, x, y - 8);
+
+    // 日付ラベル（ドットの下）
+    ctx.fillStyle = '#555';
+    ctx.font = '9px sans-serif';
+    ctx.fillText(p.label, x, H - pad.b + 12);
+  });
+
+  // インサイト
+  const latest = points[n - 1];
+  const el = document.getElementById('vdotPrediction');
+  if (el) {
+    if (n >= 2) {
+      const prev = points[n - 2];
+      const diff = latest.v - prev.v;
+      el.textContent = diff > 0
+        ? `前回比 +${diff}pt 向上 — 継続できています`
+        : diff < 0
+        ? `前回比 ${diff}pt 低下 — 練習を見直しましょう`
+        : '前回と同値 — 停滞期かも';
+      el.style.color = diff > 0 ? 'var(--accent)' : diff < 0 ? '#ff4444' : '#888';
+    } else {
+      el.textContent = 'レースを重ねるとVDOT推移グラフが完成します';
+      el.style.color = '#888';
+    }
+  }
+
+  const insight = document.getElementById('vdotInsight');
+  if (insight) {
+    const raceCount = n;
+    const maxV2 = Math.max(...vdots);
+    const gap = CONFIG.targetVdot - latest.v;
+    insight.textContent = `計測回数: ${raceCount}回  /  最高VDOT: ${maxV2}  /  VDOT53まで: あと${gap}pt`;
+  }
+}
+
+function renderTypeChart(logs) {
+  const canvas = document.getElementById('typeChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 320;
+  const H = 80;
+  canvas.width = W * window.devicePixelRatio;
+  canvas.height = H * window.devicePixelRatio;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  ctx.clearRect(0, 0, W, H);
+
+  const fourWeeksAgo = new Date(Date.now() - 28 * 86400000);
+  const recent = logs.filter(l => new Date(l.date) >= fourWeeksAgo);
+  const counts = { easy: 0, tempo: 0, interval: 0, long: 0 };
+  recent.forEach(l => {
+    const type = l.runType || classifyRunByPace(parseFloat(l.distKm), parseInt(l.moving_time));
+    if (counts[type] !== undefined) counts[type]++;
+    else counts.easy++;
+  });
+  const total = Object.values(counts).reduce((a,b)=>a+b, 0);
+  if (total === 0) return;
+
+  const labels = { easy: 'Easy', tempo: '閾値', interval: 'インターバル', long: 'ロング' };
+  const colors = { easy: '#4488ff', tempo: '#e8ff00', interval: '#ff6600', long: '#22cc88' };
+  const entries = Object.entries(counts).filter(([,v]) => v > 0);
+  const barH = 24;
+  let x = 0;
+
+  // 比率バー
+  entries.forEach(([type, cnt]) => {
+    const w = (cnt / total) * W;
+    ctx.fillStyle = colors[type];
+    ctx.fillRect(x, 0, w, barH);
+    if (w > 30) {
+      ctx.fillStyle = '#000';
+      ctx.font = `bold 10px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(`${Math.round(cnt/total*100)}%`, x + w/2, barH/2 + 4);
+    }
+    x += w;
+  });
+
+  // 凡例はHTMLで描画（Canvas文字化け・見切れ対策）
+  const legendEl = document.getElementById('typeChartLegend');
+  if (legendEl) {
+    legendEl.innerHTML = entries.map(([type, cnt]) =>
+      `<span style="display:inline-flex;align-items:center;gap:4px;margin-right:10px;font-size:10px;color:#aaa;">
+        <span style="display:inline-block;width:10px;height:10px;background:${colors[type]};border-radius:2px;flex-shrink:0;"></span>
+        ${labels[type]} ${cnt}本
+      </span>`
+    ).join('');
+  }
+
+  // インサイト（カノーバ理論：閾値+インターバルが30%以上が理想）
+  const quality = counts.tempo + counts.interval;
+  const qualRatio = total > 0 ? quality / total : 0;
+  const insightEl = document.getElementById('typeInsight');
+  if (insightEl) {
+    if (qualRatio < 0.25) insightEl.textContent = '⚠ 質の高い練習（閾値・インターバル）が不足しています。週2回以上を目標に。';
+    else if (qualRatio > 0.6) insightEl.textContent = '⚠ 高強度が多すぎます。EasyとLongで土台を作りましょう。';
+    else insightEl.textContent = `✓ 練習バランス良好。質の高い練習が${Math.round(qualRatio*100)}%。`;
+  }
+}
+
+function renderWeeklyChart(logs) {
+  const canvas = document.getElementById('monthlyChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 320;
+  const H = 110;
+  canvas.width = W * window.devicePixelRatio;
+  canvas.height = H * window.devicePixelRatio;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  ctx.clearRect(0, 0, W, H);
+
+  // 過去8週の週間距離
+  const now = new Date();
+  const weeks = [];
+  for (let i = 7; i >= 0; i--) {
+    const weekEnd = new Date(now);
+    weekEnd.setDate(now.getDate() - i * 7);
+    const weekStart = new Date(weekEnd);
+    weekStart.setDate(weekEnd.getDate() - 6);
+    const dist = logs.filter(l => {
+      const d = new Date(l.date);
+      return d >= weekStart && d <= weekEnd;
+    }).reduce((s, l) => s + (parseFloat(l.distKm) || 0), 0);
+    weeks.push({ label: `${weekEnd.getMonth()+1}/${weekEnd.getDate()}`, dist });
+  }
+
+  const maxDist = Math.max(...weeks.map(w => w.dist), 60);
+  const pad = { t: 14, b: 22, l: 8, r: 8 };
+  const gW = W - pad.l - pad.r;
+  const gH = H - pad.t - pad.b;
+  const barW = gW / weeks.length * 0.55;
+  const gap = gW / weeks.length;
+  const targetY = pad.t + (1 - 60 / maxDist) * gH;
+
+  // 目標ライン60km
+  ctx.strokeStyle = 'rgba(232,255,0,0.3)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(pad.l, targetY); ctx.lineTo(W - pad.r, targetY); ctx.stroke();
+  ctx.setLineDash([]);
+
+  weeks.forEach((w, i) => {
+    const x = pad.l + i * gap + gap * 0.2;
+    const barH = (w.dist / maxDist) * gH;
+    const y = pad.t + gH - barH;
+    const isCurrentWeek = i === 7;
+    ctx.fillStyle = isCurrentWeek ? '#e8ff00' : w.dist >= 60 ? '#22cc88' : '#333';
+    ctx.fillRect(x, y, barW, barH);
+    if (w.dist > 0) {
+      ctx.fillStyle = isCurrentWeek ? '#e8ff00' : w.dist >= 60 ? '#22cc88' : '#555';
+      ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(Math.round(w.dist), x + barW/2, y - 3);
+    }
+    ctx.fillStyle = '#555'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(w.label, x + barW/2, H - 6);
+  });
+}
+
+function renderMonthlyChart(logs) { renderWeeklyChart(logs); }
+
+
+// ===== API KEY MANAGEMENT =====
+const API_KEY_STORAGE = 'sub3_anthropic_key';
+
+// Cookieに保存（SafariのITP対策 - cookieは消えにくい）
+function setCookie(name, value, days) {
+  const d = new Date();
+  d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()};path=/;SameSite=Strict`;
+}
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function getApiKey() {
+  return localStorage.getItem(API_KEY_STORAGE)
+      || sessionStorage.getItem(API_KEY_STORAGE)
+      || getCookie(API_KEY_STORAGE)
+      || '';
+}
+
+// 起動時にcookie/IndexedDBからlocalStorageに復元
+async function restoreApiKeyFromIDB() {
+  if (getApiKey()) return;
+  // Cookieから復元
+  const fromCookie = getCookie(API_KEY_STORAGE);
+  if (fromCookie) {
+    try { localStorage.setItem(API_KEY_STORAGE, fromCookie); } catch(e) {}
+    try { sessionStorage.setItem(API_KEY_STORAGE, fromCookie); } catch(e) {}
+    return;
+  }
+  // IndexedDBから復元
+  const key = await idbGet(API_KEY_STORAGE);
+  if (key) {
+    try { localStorage.setItem(API_KEY_STORAGE, key); } catch(e) {}
+    try { sessionStorage.setItem(API_KEY_STORAGE, key); } catch(e) {}
+    setCookie(API_KEY_STORAGE, key, 365);
+  }
+}
+
+function saveApiKey() {
+  const input = document.getElementById('apiKeyInput').value.trim();
+  const errorEl = document.getElementById('apiKeyError');
+  if (!input.startsWith('sk-ant-')) {
+    errorEl.textContent = '⚠️ キーは sk-ant- で始まる必要があります';
+    return;
+  }
+  // localStorage / sessionStorage / Cookie / IndexedDB の4箇所に保存
+  try { localStorage.setItem(API_KEY_STORAGE, input); } catch(e) {}
+  try { sessionStorage.setItem(API_KEY_STORAGE, input); } catch(e) {}
+  setCookie(API_KEY_STORAGE, input, 365);  // 1年間
+  idbSet(API_KEY_STORAGE, input);
+  hideApiKeyModal();
+  updateApiKeyStatus();
+  showToast('✅ APIキーを保存しました');
+}
+function openIDB() {
+  if (_idb) return Promise.resolve(_idb);
+  return new Promise((res, rej) => {
+    const req = indexedDB.open('sub3lab', 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore('kv');
+    req.onsuccess = e => { _idb = e.target.result; res(_idb); };
+    req.onerror = () => rej();
+  });
+}
+async function idbSet(key, val) {
+  try {
+    const db = await openIDB();
+    return new Promise(res => {
+      const tx = db.transaction('kv', 'readwrite');
+      tx.objectStore('kv').put(val, key);
+      tx.oncomplete = () => res();
+    });
+  } catch(e) {}
+}
+async function idbGet(key) {
+  try {
+    const db = await openIDB();
+    return new Promise(res => {
+      const tx = db.transaction('kv', 'readonly');
+      const req = tx.objectStore('kv').get(key);
+      req.onsuccess = () => res(req.result || null);
+      req.onerror = () => res(null);
+    });
+  } catch(e) { return null; }
+}
+
+
+function showApiKeyModal() {
+  const modal = document.getElementById('apiKeyModal');
+  modal.style.display = 'flex';
+  document.getElementById('apiKeyInput').value = getApiKey();
+  document.getElementById('apiKeyError').textContent = '';
+  setTimeout(() => document.getElementById('apiKeyInput').focus(), 100);
+}
+
+function hideApiKeyModal() {
+  document.getElementById('apiKeyModal').style.display = 'none';
+}
+
+function updateApiKeyStatus() {
+  const el = document.getElementById('apiKeyStatus');
+  if (!el) return;
+  const key = getApiKey();
+  el.textContent = key ? `設定済み (${key.slice(0,12)}...)` : '未設定';
+  el.style.color = key ? 'var(--accent)' : '#ff4444';
+}
+
+// APIリクエスト共通関数（キー自動付与）
+async function callClaude(body) {
+  const key = getApiKey();
+  if (!key) {
+    showApiKeyModal();
+    throw new Error('API key not set');
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000); // 30秒タイムアウト
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+    if (res.status === 401) {
+      localStorage.removeItem(API_KEY_STORAGE);
+      showApiKeyModal();
+      document.getElementById('apiKeyError').textContent = '❌ APIキーが無効です。再入力してください';
+      throw new Error('Invalid API key');
+    }
+    return res.json();
+  } catch(e) {
+    if (e.name === 'AbortError') throw new Error('タイムアウト（30秒）。再試行してください');
+    throw e;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+// カノーバのシステムプロンプト（核心）
+function getCanovaSystemPrompt() {
+  const logs = getLogs();
+  const vdot = findBestVdotWithFallback();
+  const phase = getCurrentPhase();
+
+  const now = new Date();
+  const fourWeeksAgo = new Date(now - 28 * 86400000);
+  const recentLogs = logs.filter(l => new Date(l.date) >= fourWeeksAgo);
+  const totalRecentDist = recentLogs.reduce((s, l) => s + (parseFloat(l.distKm) || 0), 0);
+
+  const monthly = {};
+  logs.forEach(l => {
+    const d = new Date(l.date);
+    if (isNaN(d)) return;
+    const key = d.getFullYear() + '/' + (d.getMonth()+1) + '月';
+    monthly[key] = (monthly[key] || 0) + (parseFloat(l.distKm) || 0);
+  });
+  const monthlyStr = Object.entries(monthly).sort().slice(-4).map(function(e){ return e[0] + ': ' + Math.round(e[1]) + 'km'; }).join('、');
+
+  let speedCount = 0, tempoCount = 0, easyCount = 0, longCount = 0;
+  logs.forEach(l => {
+    const type = l.runType || classifyRunByPace(parseFloat(l.distKm), parseInt(l.moving_time));
+    if (type === 'interval') speedCount++;
+    else if (type === 'tempo') tempoCount++;
+    else if (type === 'long') longCount++;
+    else easyCount++;
+  });
+
+  const todayStr = now.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+  const logSummary = buildLogSummary(logs);
+
+  const parts = [];
+  parts.push('あなたはRenato Canova（レナト・カノーバ）の指導哲学と知識を完全に持つマラソンコーチAIです。');
+  parts.push('');
+  parts.push('【今日の日付】');
+  parts.push(todayStr + '（これを必ず基準にして、過去・未来の日付を判断すること）');
+  parts.push('');
+  parts.push('【カノーバとしての基本姿勢】');
+  parts.push('- 感情ではなく生理学と数字で話す。根拠のない励ましはしない');
+  parts.push('- 「なぜそのトレーニングをするのか」を必ず説明する');
+  parts.push('- 問題点はズバリ指摘する。遠回しな言い方をしない');
+  parts.push('- 選手の弱点を正確に診断し、処方箋を出すのが仕事だ');
+  parts.push('- レースは最高のトレーニングだ。積極的に出場を勧める');
+  parts.push('- 日本語で話すが、思考はイタリア人コーチとして明快かつ直接的に');
+  parts.push('');
+  parts.push('【選手データ】');
+  parts.push('名前：川島大輝（31歳）');
+  parts.push('現在VDOT：' + vdot);
+  parts.push('目標：つくばマラソン2026（2026/11/22）サブスリー（VDOT53必要）');
+  parts.push('現在フェーズ：' + phase.name + ' - ' + phase.label + '（目標：' + phase.goal + '）');
+  parts.push('週5日練習可能');
+  parts.push('');
+  parts.push('【練習データ統計（全' + logs.length + '件）】');
+  parts.push('直近4週間：' + Math.round(totalRecentDist) + 'km（' + recentLogs.length + '本）');
+  parts.push('月別走行距離：' + (monthlyStr || 'データなし'));
+  parts.push('タイプ別内訳：Easy' + easyCount + '本、閾値' + tempoCount + '本、インターバル' + speedCount + '本、ロング' + longCount + '本');
+  parts.push('');
+  parts.push('【現状診断】');
+  parts.push('最大課題：乳酸閾値が低い。4分15秒/kmで2kmが限界→これをサブスリーペースで42km走れるまで引き上げることが全て。');
+  parts.push('Phase1の優先事項：4分30秒〜4分40秒/kmで20〜30分を維持できる閾値走を週1回。');
+  parts.push('');
+  parts.push('【全練習ログ一覧（詳細）】');
+  parts.push(logSummary);
+  parts.push('');
+  parts.push('返答は簡潔に、でも具体的に。数字で話せ。200〜300字を目安にしつつ、必要なら長くなっても構わない。');
+  parts.push('選手のデータを参照する際は必ず具体的な日付・距離・ペース・心拍数を引用して根拠を示せ。');
+
+  return parts.join('\n');
+}
+
+function buildLogSummary(logs) {
+  const sorted = [...logs].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const lines = [];
+
+  sorted.forEach(function(l, i) {
+    const dist = parseFloat(l.distKm) || 0;
+    const timeSec = parseInt(l.moving_time) || parseDuration(l.duration);
+    const pace = formatPace(dist, timeSec);
+    const date = new Date(l.date);
+    const dateStr = isNaN(date) ? '不明' : date.toLocaleDateString('ja-JP', {month:'numeric', day:'numeric', weekday:'short'});
+    const type = l.runType || classifyRunByPace(dist, timeSec);
+    const typeLabel = { easy:'Easy', long:'Long', tempo:'閾値', interval:'インターバル', race:'レース' }[type] || type;
+    const hr = l.average_heartrate ? ' HR' + Math.round(l.average_heartrate) : '';
+    const maxHR = l.max_heartrate ? '/max' + l.max_heartrate : '';
+    const power = l.avg_power ? ' ' + l.avg_power + 'W' : '';
+    const cadence = l.avg_cadence ? ' ' + l.avg_cadence + 'spm' : '';
+    const plan = l.planAnalysis ? ' [計画比:' + l.planAnalysis.verdict + ']' : '';
+
+    let line = dateStr + ' [' + typeLabel + '] ' + dist.toFixed(1) + 'km ' + pace + '/km' + hr + maxHR + power + cadence + plan;
+
+    if (i < 20 && l.laps && l.laps.length > 0) {
+      const lapStr = l.laps.filter(function(lp){ return lp.dist && lp.dist > 0.3; }).slice(0, 10).map(function(lp, j) {
+        const lpPace = lp.dist && lp.time ? formatPace(lp.dist, lp.time) : '-';
+        return 'Lap' + (j+1) + ':' + lpPace + (lp.hr ? '/HR' + lp.hr : '');
+      }).join(' ');
+      if (lapStr) line = line + ' | ' + lapStr;
+    }
+
+    lines.push(line);
+  });
+
+  return lines.join('\n');
+}
+
+// 週次レビュー生成
+async function generateWeeklyReview() {
+  const reviewEl = document.getElementById('weeklyReview');
+  reviewEl.innerHTML = `<div class="loading"><div class="dots"><span></span><span></span><span></span></div> カノーバが先週を採点中...</div>`;
+
+  const logs = getLogs();
+  const oneWeekAgo = new Date(Date.now() - 7 * 86400000);
+  const lastWeekLogs = logs.filter(l => new Date(l.date) >= oneWeekAgo);
+
+  let weekSummary = lastWeekLogs.length > 0
+    ? lastWeekLogs.map(l => {
+        const dist = parseFloat(l.distKm) || 0;
+        const time = parseInt(l.moving_time) || 0;
+        return `${new Date(l.date).toLocaleDateString('ja-JP', {weekday:'short'})} ${dist.toFixed(1)}km ${formatPace(dist, time)}/km HR${l.average_heartrate || '—'}`;
+      }).join('\n')
+    : '先週の練習記録なし';
+
+  try {
+    const data = await callClaude({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 600,
+        system: getCanovaSystemPrompt(),
+        messages: [{ role: "user", content: `先週の練習を採点してください：\n${weekSummary}\n\n良かった点、悪かった点、今週の課題を具体的に指摘してください。` }]
+    });
+    const text = data.content?.[0]?.text || 'レビュー取得失敗';
+    reviewEl.innerHTML = mdToHtml(text);
+  } catch(e) {
+    reviewEl.innerHTML = 'コーチへの接続に失敗しました。';
+  }
+}
+
+// チャット履歴
+let chatMessages = [];
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  appendChatBubble(msg, 'user');
+  chatMessages.push({ role: 'user', content: msg });
+
+  const loadingId = 'loading_' + Date.now();
+  const chatHistory = document.getElementById('chatHistory');
+  chatHistory.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-coach"><div class="loading"><div class="dots"><span></span><span></span><span></span></div></div></div>`;
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+
+  try {
+    const systemPrompt = getCanovaSystemPrompt();
+    console.log('[SUB3] system prompt length:', systemPrompt.length, 'chars');
+    console.log('[SUB3] log section preview:', systemPrompt.slice(systemPrompt.indexOf('全練習ログ'), systemPrompt.indexOf('全練習ログ') + 300));
+    const data = await callClaude({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1500,
+        system: systemPrompt,
+        messages: chatMessages
+    });
+    const reply = data.content?.[0]?.text || '返答取得失敗';
+    chatMessages.push({ role: 'assistant', content: reply });
+
+    const loadingEl = document.getElementById(loadingId);
+    if (loadingEl) loadingEl.remove();
+    appendChatBubble(reply, 'coach');
+  } catch(e) {
+    const loadingEl = document.getElementById(loadingId);
+    if (loadingEl) loadingEl.innerHTML = '接続失敗。再試行してください。';
+  }
+}
+
+function openRescheduleModal() {
+  const overlay = document.createElement('div');
+  overlay.className = 'edit-modal-overlay';
+  overlay.id = 'rescheduleOverlay';
+  overlay.innerHTML = `
+    <div class="edit-modal">
+      <h3>今週のスケジュールを組み替える</h3>
+      <div class="edit-field">
+        <label>走れない日・制約を入力</label>
+        <textarea id="rescheduleInput" placeholder="例：水曜と土曜は走れない。木曜は短め希望。" style="height:80px"></textarea>
+      </div>
+      <div class="edit-modal-btns">
+        <button class="btn-cancel-edit" onclick="document.getElementById('rescheduleOverlay').remove()">キャンセル</button>
+        <button class="btn-save-edit" onclick="rescheduleWithAI()">AIに組み替えてもらう</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  setTimeout(() => document.getElementById('rescheduleInput').focus(), 100);
+}
+
+async function rescheduleWithAI() {
+  const constraint = document.getElementById('rescheduleInput')?.value?.trim();
+  if (!constraint) { showToast('制約を入力してください'); return; }
+
+  const mission = getMission();
+  if (!mission) { showToast('先にミッションを生成してください'); return; }
+
+  const btn = document.querySelector('#rescheduleOverlay .btn-save-edit');
+  if (btn) { btn.disabled = true; btn.textContent = '組み替え中...'; }
+
+  try {
+    const currentMissions = JSON.stringify(mission.missions, null, 2);
+    const today = new Date().toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
+    const data = await callClaude({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 800,
+      system: `あなたはマラソンコーチです。今日は${today}。現在のウィークリーミッションを、ユーザーの制約に合わせて組み替えてください。日曜日は必ず除外。月〜土の中で調整すること。JSONのmissions配列のみを返してください。コードブロック不要。`,
+      messages: [{ role: 'user', content: `現在のミッション:\n${currentMissions}\n\n制約: ${constraint}\n\nこの制約を守りながら同じトレーニング内容を適切な曜日に再配置してください。` }]
+    });
+
+    const text = data.content?.[0]?.text || '';
+    let clean = text.replace(/^```[\w]*\n?/gm, '').replace(/```$/gm, '').trim();
+    const arrMatch = clean.match(/\[[\s\S]*\]/);
+    if (!arrMatch) throw new Error('No JSON array found');
+    const newMissions = JSON.parse(arrMatch[0]);
+
+    mission.missions = newMissions;
+    saveMission(mission);
+    renderMissionCard(mission);
+    document.getElementById('rescheduleOverlay')?.remove();
+    showToast('✅ スケジュールを組み替えました');
+  } catch(e) {
+    showToast('❌ 組み替えに失敗: ' + (e.message || ''));
+    if (btn) { btn.disabled = false; btn.textContent = 'AIに組み替えてもらう'; }
+  }
+}
+
+function quickChat(msg) {
+  document.getElementById('chatInput').value = msg;
+  sendChat();
+  showPage('coach', document.querySelectorAll('.nav-item')[1]);
+}
+
+// マークダウン→HTML変換
+function mdToHtml(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^### (.+)$/gm, '<div style="font-size:13px;font-weight:700;color:var(--accent);margin:12px 0 4px">$1</div>')
+    .replace(/^## (.+)$/gm,  '<div style="font-size:14px;font-weight:700;color:var(--text);margin:14px 0 6px">$1</div>')
+    .replace(/^- (.+)$/gm,   '<div style="padding-left:12px;margin:3px 0">・$1</div>')
+    .replace(/^\d+\. (.+)$/gm, '<div style="padding-left:12px;margin:3px 0">$&</div>')
+    .replace(/\n/g, '<br>');
+}
+
+function appendChatBubble(text, role) {
+  const chatHistory = document.getElementById('chatHistory');
+  const div = document.createElement('div');
+  div.className = `chat-bubble chat-${role}`;
+  div.innerHTML = mdToHtml(text);
+  chatHistory.appendChild(div);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+// ===== BACKUP / RESTORE =====
+function exportBackup() {
+  const logs = getLogs();
+  const mission = getMission();
+  const backup = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    logs,
+    mission
+  };
+  const json = JSON.stringify(backup, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sub3lab_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  document.getElementById('backupStatus').textContent = `✅ ${logs.length}件のデータをバックアップしました`;
+}
+
+function importBackup(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if (!backup.logs || !Array.isArray(backup.logs)) throw new Error('Invalid backup');
+      saveLogs(backup.logs);
+      if (backup.mission) saveMission(backup.mission);
+      renderVdotCard(findBestVdot());
+      renderLogList();
+      renderStats();
+      document.getElementById('backupStatus').textContent = `✅ ${backup.logs.length}件のデータを復元しました`;
+      showToast(`✅ バックアップから${backup.logs.length}件を復元しました`);
+    } catch(err) {
+      document.getElementById('backupStatus').textContent = '❌ 復元に失敗しました';
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ===== INIT =====
+async function init() {
+  // IndexedDBからAPIキーを復元してから判定（Safari対策）
+  await restoreApiKeyFromIDB();
+
+  const vdot = findBestVdotWithFallback();
+  renderVdotCard(vdot);
+
+  // 保存済みミッションがあれば表示
+  const savedMission = getMission();
+  if (savedMission) {
+    renderMissionCard(savedMission);
+    renderGapAnalysis(savedMission);
+  }
+
+  // APIキー状態を更新（IDB復元後なので正確）
+  updateApiKeyStatus();
+
+  // APIキー未設定かつ初回のみモーダルを表示
+  const hasShownModal = localStorage.getItem('sub3_api_modal_shown');
+  if (!getApiKey() && !hasShownModal) {
+    localStorage.setItem('sub3_api_modal_shown', '1');
+    setTimeout(showApiKeyModal, 300);
+  }
+}
+
+// 週次レビューをキャッシュするよう上書き
+const _origGenerateWeeklyReview = generateWeeklyReview;
+async function generateWeeklyReviewCached() {
+  await _origGenerateWeeklyReview();
+  const text = document.getElementById('weeklyReview').innerHTML;
+  localStorage.setItem('sub3_weekly_review', text);
+  localStorage.setItem('sub3_last_review', new Date().toISOString().slice(0, 10));
+}
+// ボタンから呼ばれる関数を更新版に
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.querySelector('[onclick="generateWeeklyReview()"]');
+  if (btn) btn.setAttribute('onclick', 'generateWeeklyReviewCached()');
+});
+
+init();
+
+// ===== PLAN vs ACTUAL =====
+
+function findMissionForLog(log) {
+  // ログの日付からその曜日に対応するミッションを探す
+  const mission = getMission();
+  if (!mission || !mission.missions) return null;
+  const date = new Date(log.date);
+  if (isNaN(date)) return null;
+  const dowMap = ['日','月','火','水','木','金','土'];
+  const logDow = dowMap[date.getDay()];
+  return mission.missions.find(m => m.day === logDow) || null;
+}
+
+function parsePlannedPaceRange(paceStr) {
+  // "4分35秒から4分40秒" → {min: 275, max: 280} (秒)
+  if (!paceStr) return null;
+  const matches = paceStr.match(/(\d+)分(\d+)秒/g);
+  if (!matches || matches.length < 1) return null;
+  const toSec = s => {
+    const m = s.match(/(\d+)分(\d+)秒/);
+    return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : null;
+  };
+  const times = matches.map(toSec).filter(Boolean);
+  return times.length >= 2
+    ? { min: Math.min(...times), max: Math.max(...times) }
+    : times.length === 1 ? { min: times[0] - 10, max: times[0] + 10 } : null;
+}
+
+function judgePlanVsActual(mission, log) {
+  // 計画と実績を比較してVERDICTを返す
+  const dist = parseFloat(log.distKm) || 0;
+  const timeSec = parseInt(log.moving_time) || 0;
+  if (!timeSec || !dist) return 'UNKNOWN';
+
+  const actualPaceSec = timeSec / dist; // 秒/km
+  const plannedDist = parseFloat(mission.distance) || 0;
+  const paceRange = parsePlannedPaceRange(mission.pace);
+
+  let distOk = plannedDist > 0 ? dist >= plannedDist * 0.85 : true;
+  let paceOk = paceRange
+    ? (actualPaceSec >= paceRange.min - 20 && actualPaceSec <= paceRange.max + 30)
+    : true;
+
+  if (distOk && paceOk) return 'ACHIEVED';
+  if (distOk || paceOk) return 'PARTIAL';
+  return 'MISSED';
+}
+
+async function runPlanAnalysis(logIndex, missionItem) {
+  const logs = getLogs();
+  const log = logs[logIndex];
+  if (!log || !missionItem) return;
+
+  const dist = parseFloat(log.distKm) || 0;
+  const timeSec = parseInt(log.moving_time) || 0;
+  const pace = formatPace(dist, timeSec);
+  const hr = log.average_heartrate ? Math.round(log.average_heartrate) : '—';
+  const verdict = judgePlanVsActual(missionItem, log);
+
+  const systemPrompt = `あなたはマラソンコーチです。川島大輝選手（VDOT${findBestVdotWithFallback()}、目標サブ3）の練習計画と実績を比較分析してください。
+分析は以下の形式でJSON形式のみ返してください（他のテキスト不要）：
+{"verdict":"${verdict}","comment":"100字以内の具体的なフィードバック（強調したい部分は<strong>タグで）","score":0から100の達成度}`;
+
+  const userPrompt = `計画：${missionItem.type} ${missionItem.distance}、ペース目標：${missionItem.pace}、意図：${missionItem.key || missionItem.detail}
+実績：${dist.toFixed(1)}km、${pace}/km、心拍${hr}bpm${log.avg_power ? '、パワー' + log.avg_power + 'W' : ''}`;
+
+  try {
+    const data = await callClaude({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 300,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }]
+    });
+    const raw = data.content?.[0]?.text || '{}';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const result = JSON.parse(clean);
+
+    // ログに保存
+    logs[logIndex].planAnalysis = {
+      missionType: missionItem.type,
+      plannedPace: missionItem.pace,
+      plannedDist: missionItem.distance,
+      verdict: result.verdict || verdict,
+      score: result.score || 0,
+      comment: result.comment || '',
+      analyzedAt: new Date().toISOString()
+    };
+    saveLogs(logs);
+    renderPlanActualSummary();
+    return logs[logIndex].planAnalysis;
+  } catch(e) {
+    // フォールバック：AIなしで保存
+    logs[logIndex].planAnalysis = {
+      missionType: missionItem.type,
+      plannedPace: missionItem.pace,
+      plannedDist: missionItem.distance,
+      verdict,
+      score: verdict === 'ACHIEVED' ? 90 : verdict === 'PARTIAL' ? 60 : 30,
+      comment: '',
+      analyzedAt: new Date().toISOString()
+    };
+    saveLogs(logs);
+    renderPlanActualSummary();
+    return logs[logIndex].planAnalysis;
+  }
+}
+
+function renderPlanActualSummary() {
+  const container = document.getElementById('planActualSummary');
+  if (!container) return;
+  const logs = getLogs();
+  const mission = getMission();
+  if (!mission || !mission.missions) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-dim);text-align:center;padding:16px;">ミッションを生成するとここに計画vs実績が表示されます</div>';
+    return;
+  }
+
+  // 今週のログ（月〜日）
+  const now = new Date();
+  const mondayOffset = now.getDay() === 0 ? -6 : 1 - now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + mondayOffset);
+  monday.setHours(0,0,0,0);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23,59,59,999);
+
+  const weekLogs = logs.filter(l => {
+    const d = new Date(l.date);
+    return d >= monday && d <= sunday;
+  });
+
+  const verdictColor = { ACHIEVED: 'var(--accent)', PARTIAL: '#ff9900', MISSED: '#ff4444', UNKNOWN: '#888' };
+  const verdictLabel = { ACHIEVED: '達成', PARTIAL: '部分達成', MISSED: '未達', UNKNOWN: '分析中' };
+  const verdictIcon = { ACHIEVED: '✓', PARTIAL: '△', MISSED: '✕', UNKNOWN: '…' };
+
+  const rows = mission.missions.map(m => {
+    const dowMap = { '月':1,'火':2,'水':3,'木':4,'金':5,'土':6,'日':0 };
+    const mDate = new Date(monday);
+    mDate.setDate(monday.getDate() + (dowMap[m.day] !== undefined ? (dowMap[m.day] === 0 ? 6 : dowMap[m.day] - 1) : 0));
+    const matched = weekLogs.find(l => {
+      const ld = new Date(l.date);
+      return ld.toDateString() === mDate.toDateString();
+    });
+
+    const analysis = matched?.planAnalysis;
+    const verdict = analysis?.verdict || (matched ? 'UNKNOWN' : null);
+    const score = analysis?.score || null;
+
+    return { m, matched, analysis, verdict, score, mDate };
+  });
+
+  const achieved = rows.filter(r => r.verdict === 'ACHIEVED').length;
+  const total = rows.filter(r => r.verdict).length;
+
+  container.innerHTML = `
+    ${total > 0 ? `<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">今週の達成率: <span style="color:var(--accent);font-weight:700;">${total > 0 ? Math.round(achieved/total*100) : 0}%</span> (${achieved}/${total})</div>` : ''}
+    ${rows.map(r => `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;gap:10px;">
+        <div style="flex-shrink:0;width:28px;text-align:center;">
+          <div style="font-size:9px;color:var(--text-dim);">${r.m.day}</div>
+          <div style="font-size:${r.verdict ? '16px' : '11px'};color:${r.verdict ? verdictColor[r.verdict] : '#444'};font-weight:700;line-height:1.2;">
+            ${r.verdict ? verdictIcon[r.verdict] : '—'}
+          </div>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            <span style="font-size:11px;font-weight:700;">${r.m.type}</span>
+            <span style="font-size:10px;color:var(--text-muted);">${r.m.distance}</span>
+            ${r.verdict ? `<span style="font-size:9px;color:${verdictColor[r.verdict]};margin-left:auto;">${verdictLabel[r.verdict]}${r.score ? ' ' + r.score + 'pt' : ''}</span>` : ''}
+          </div>
+          <div style="font-size:10px;color:var(--text-dim);">計画 ${r.m.pace}</div>
+          ${r.matched ? `<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">実績 ${formatPace(parseFloat(r.matched.distKm), parseInt(r.matched.moving_time)||0)}/km ${parseFloat(r.matched.distKm).toFixed(1)}km</div>` : ''}
+          ${r.analysis?.comment ? `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.5;">${r.analysis.comment}</div>` : r.matched && !r.analysis ? `<button onclick="triggerPlanAnalysis(${logs.indexOf(r.matched)})" style="margin-top:4px;font-size:10px;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:4px;padding:3px 8px;cursor:pointer;">AIで分析</button>` : ''}
+        </div>
+      </div>`).join('')}
+  `;
+}
+
+async function triggerPlanAnalysis(logIndex) {
+  const logs = getLogs();
+  const log = logs[logIndex];
+  if (!log) return;
+  const mission = findMissionForLog(log);
+  if (!mission) { showToast('この日のミッションが見つかりません'); return; }
+  showToast('分析中...');
+  await runPlanAnalysis(logIndex, mission);
+  showToast('✅ 分析完了');
+}
+
+</script>
+</body>
+</html>
